@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "unicorn", "import", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": { "browser": true, "es2024": true },
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eqeqeq": ["error", "smart"],
+    "import/no-cycle": "error",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/anchor-has-content": "error",
+    "jsx-a11y/aria-props": "error",
+    "jsx-a11y/role-has-required-aria-props": "error",
+    "react/jsx-key": "error",
+    "react/no-array-index-key": "off",
+    "react/react-in-jsx-scope": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "warn",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "import/no-unassigned-import": "off",
+    "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }]
+  },
+  "ignorePatterns": ["dist", "node_modules", "docs"]
+}

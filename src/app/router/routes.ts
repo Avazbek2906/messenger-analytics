@@ -1,0 +1,21 @@
+/** Every route path in one place, so no string literals leak across the code. */
+export const ROUTES = {
+  login: '/login',
+  dashboard: '/',
+  conversations: '/conversations',
+  conversation: (id: string) => `/conversations/${id}`,
+  customers: '/customers',
+  customer: (id: string) => `/customers/${id}`,
+  team: '/team',
+  teamMember: (id: string) => `/team/${id}`,
+  products: '/products',
+  agreements: '/agreements',
+  reports: '/reports',
+  cabinet: '/me',
+  settings: '/settings',
+  settingsCompany: '/settings/company',
+  settingsEmployees: '/settings/employees',
+  settingsCatalog: '/settings/catalog',
+  settingsIntegrations: '/settings/integrations',
+  noCompany: '/no-company',
+} as const

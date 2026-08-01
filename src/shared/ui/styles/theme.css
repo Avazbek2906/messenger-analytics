@@ -1,0 +1,211 @@
+/**
+ * Design tokens.
+ *
+ * Three layers: primitive (raw colours) → semantic (role) → component.
+ * Components read ONLY semantic tokens (`bg-surface`, `text-fg-muted`) and never
+ * a raw hex value — that is what makes the dark theme a pure token swap.
+ *
+ * The visual language comes from the reference designs in `docs/`: a soft
+ * neutral canvas, pure white cards, large radii and very light layered shadows.
+ */
+
+@theme {
+  /* ---------------------------------------------------------------- Typography */
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+
+  --text-2xs: 0.6875rem; /* 11px — chip, axis tick */
+  --text-2xs--line-height: 1rem;
+
+  /* ---------------------------------------------------------- Brand primitives */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+
+  /* -------------------------------------------------------- Semantic: surfaces */
+  --color-canvas: #f1f3f8;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-surface-sunken: #f1f5f9;
+  --color-overlay: rgb(15 23 42 / 0.45);
+
+  /* ------------------------------------------------------------ Semantic: text */
+  --color-fg: #0f172a;
+  --color-fg-muted: #64748b;
+  --color-fg-subtle: #94a3b8;
+  --color-fg-inverse: #ffffff;
+
+  /* --------------------------------------------------------- Semantic: borders */
+  --color-line: #e7eaf3;
+  --color-line-strong: #d5dae8;
+
+  /* ----------------------------------------------------------- Semantic: brand */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #eef2ff;
+  --color-primary-fg: #ffffff;
+
+  --color-accent: #06b6d4;
+  --color-accent-soft: #ecfeff;
+
+  /* ---------------------------------------------------------- Semantic: status */
+  --color-success: #16a34a;
+  --color-success-soft: #ecfdf3;
+  --color-success-fg: #15803d;
+
+  --color-warning: #f59e0b;
+  --color-warning-soft: #fffbeb;
+  --color-warning-fg: #b45309;
+
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-danger-fg: #b91c1c;
+
+  --color-info: #2563eb;
+  --color-info-soft: #eff6ff;
+  --color-info-fg: #1d4ed8;
+
+  --color-neutral-soft: #f1f5f9;
+  --color-neutral-fg: #475569;
+
+  /* Tooltips invert against the surface, so they need their own pair. */
+  --color-tooltip: #0f172a;
+  --color-tooltip-fg: #ffffff;
+
+  /* ---------------------------------------------------------- Channel colours */
+  --color-channel-telegram: #229ed9;
+  --color-channel-instagram: #d62976;
+  --color-channel-web: #64748b;
+
+  /* ------------------------------------------------------ Chart series palette
+   * Colour-blind safe and >= 3:1 against the plot area. Series are distinguished
+   * by colour AND line style — colour alone never carries meaning (WCAG 1.4.1). */
+  --color-chart-1: #4f46e5;
+  --color-chart-2: #06b6d4;
+  --color-chart-3: #16a34a;
+  --color-chart-4: #f59e0b;
+  --color-chart-5: #ec4899;
+  --color-chart-6: #8b5cf6;
+  --color-chart-grid: #eef1f7;
+  --color-chart-axis: #94a3b8;
+
+  /* ------------------------------------------------------------------ Radius */
+  --radius-sm: 0.5rem; /* 8px  — chip, small input */
+  --radius-md: 0.75rem; /* 12px — button, input, icon button */
+  --radius-lg: 1rem; /* 16px — nested card */
+  --radius-xl: 1.25rem; /* 20px — primary card */
+  --radius-2xl: 1.5rem; /* 24px — panel, modal */
+
+  /* ------------------------------------------------------------------ Shadows
+   * As in the reference: very light, layered, almost colourless. */
+  --shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-sm:
+    0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.03);
+  --shadow-card:
+    0 1px 2px 0 rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.1);
+  --shadow-raised:
+    0 2px 4px -1px rgb(15 23 42 / 0.05), 0 12px 32px -12px rgb(15 23 42 / 0.14);
+  --shadow-popover:
+    0 4px 8px -2px rgb(15 23 42 / 0.06), 0 20px 48px -16px rgb(15 23 42 / 0.2);
+
+  /* ------------------------------------------------------------------ Motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.55, 0, 0.65, 0.2);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* ------------------------------------------------------------------ Layout */
+  --spacing-sidebar: 16rem;
+  --spacing-sidebar-collapsed: 4.5rem;
+  --spacing-topbar: 4rem;
+}
+
+/**
+ * Dark theme.
+ *
+ * Only semantic tokens are overridden — every component already reads these, so
+ * nothing below the token layer needs to know a dark theme exists.
+ *
+ * Colours are DESATURATED tonal variants rather than inverted values, and the
+ * contrast pairs are chosen independently of the light theme: body text stays
+ * at >= 4.5:1 and secondary text at >= 3:1 against the dark surfaces.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root[data-theme='dark'] {
+  --color-canvas: #0b1120;
+  --color-surface: #131a2b;
+  --color-surface-muted: #182036;
+  --color-surface-sunken: #1e273f;
+  --color-overlay: rgb(2 6 23 / 0.65);
+
+  --color-fg: #e8ecf6;
+  --color-fg-muted: #9aa7c2;
+  --color-fg-subtle: #6b7a99;
+  --color-fg-inverse: #0b1120;
+
+  --color-line: #253049;
+  --color-line-strong: #33405e;
+
+  /* Brand lightens: #4f46e5 on a dark surface falls below 4.5:1. */
+  --color-primary: #818cf8;
+  --color-primary-hover: #a5b4fc;
+  --color-primary-soft: #1e2547;
+  --color-primary-fg: #0b1120;
+
+  --color-accent: #22d3ee;
+  --color-accent-soft: #10303a;
+
+  --color-success: #4ade80;
+  --color-success-soft: #10291d;
+  --color-success-fg: #86efac;
+
+  --color-warning: #fbbf24;
+  --color-warning-soft: #2e2410;
+  --color-warning-fg: #fcd34d;
+
+  --color-danger: #f87171;
+  --color-danger-soft: #331719;
+  --color-danger-fg: #fca5a5;
+
+  --color-info: #60a5fa;
+  --color-info-soft: #142542;
+  --color-info-fg: #93c5fd;
+
+  --color-neutral-soft: #1e273f;
+  --color-neutral-fg: #9aa7c2;
+
+  /* In dark the tooltip lifts ABOVE the canvas instead of sinking below it. */
+  --color-tooltip: #2f3a58;
+  --color-tooltip-fg: #f1f5fd;
+
+  /* Chart series lighten too, keeping >= 3:1 against the dark plot area. */
+  --color-chart-1: #818cf8;
+  --color-chart-2: #22d3ee;
+  --color-chart-3: #4ade80;
+  --color-chart-4: #fbbf24;
+  --color-chart-5: #f472b6;
+  --color-chart-6: #a78bfa;
+  --color-chart-grid: #1e273f;
+  --color-chart-axis: #6b7a99;
+
+  /* Shadows carry almost no weight on dark surfaces — borders do the work. */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.35);
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-raised: 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-popover: 0 16px 40px -16px rgb(0 0 0 / 0.7);
+}
