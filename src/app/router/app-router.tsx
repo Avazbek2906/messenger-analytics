@@ -27,6 +27,7 @@ const ProductsPage = lazy(() => import('@/pages/products/products-page'))
 const AgreementsPage = lazy(() => import('@/pages/agreements/agreements-page'))
 const SettingsLayout = lazy(() => import('@/pages/settings/settings-layout'))
 const CompanySettingsPage = lazy(() => import('@/pages/settings/company-page'))
+const AccountSettingsPage = lazy(() => import('@/pages/settings/account-page'))
 const EmployeesSettingsPage = lazy(
   () => import('@/pages/settings/employees-page'),
 )
@@ -59,8 +60,8 @@ export function AppRouter() {
 
         <Route element={<RequireAuth isLoading={isLoading} error={error} />}>
           <Route element={<AppShell />}>
-            {/* Kompaniya darajasidagi dashboardlar. Xodim kabineti
-                foydalanuvchisi bu yerda 403 olardi — u `/me` ga yo'naltiriladi. */}
+            {/* Company-level dashboards. An employee-cabinet user would get a
+                403 here, so they are redirected to `/me` instead. */}
             <Route element={<RequireCompanyDashboards />}>
               <Route index element={<DashboardPage />} />
               <Route path={ROUTES.team}>
@@ -81,6 +82,7 @@ export function AppRouter() {
             <Route path={ROUTES.settings} element={<SettingsLayout />}>
               <Route index element={<Navigate to="company" replace />} />
               <Route path="company" element={<CompanySettingsPage />} />
+              <Route path="account" element={<AccountSettingsPage />} />
               <Route path="employees" element={<EmployeesSettingsPage />} />
               <Route path="catalog" element={<CatalogSettingsPage />} />
               <Route path="integrations" element={<IntegrationsPage />} />

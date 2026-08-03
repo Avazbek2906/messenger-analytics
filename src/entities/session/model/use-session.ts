@@ -44,11 +44,11 @@ export function useSessionBootstrap(): {
 
   // Cabinet probe: is this user linked to an `Employee` record? This is a UI
   // HINT, not required data — so ANY error is read as "no cabinet" and can
-  // never bring bootstrap down. (The backend may answer `403` here rather than
-  // the documented `400 no_employee_profile`.)
-  const identityQuery = useQuery({
-    queryKey: ['session', 'employee-identity'],
-    queryFn: () => sessionApi.employeeIdentity().catch(() => null),
+  // never bring bootstrap down. (Besides the documented
+  // `400 no_employee_profile` the backend may also answer `403` here.)
+  const cabinetQuery = useQuery({
+    queryKey: queryKeys.session.cabinet(),
+    queryFn: () => sessionApi.hasCabinet().catch(() => false),
     enabled: hasCompany,
     staleTime: 10 * 60_000,
     retry: false,
@@ -56,7 +56,7 @@ export function useSessionBootstrap(): {
 
   const isResolved =
     Boolean(user) &&
-    (!hasCompany || (companyQuery.isSuccess && identityQuery.isSuccess))
+    (!hasCompany || (companyQuery.isSuccess && cabinetQuery.isSuccess))
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -69,7 +69,7 @@ export function useSessionBootstrap(): {
       buildSessionContext(
         user,
         companyQuery.data ?? null,
-        Boolean(identityQuery.data),
+        cabinetQuery.data ?? false,
       ),
     )
   }, [
@@ -77,13 +77,13 @@ export function useSessionBootstrap(): {
     isResolved,
     user,
     companyQuery.data,
-    identityQuery.data,
+    cabinetQuery.data,
     setContext,
   ])
 
   return {
     isLoading: isAuthenticated && !isResolved && !userQuery.isError,
-    // `identityQuery` is deliberately absent: its failure must not stop bootstrap.
+    // `cabinetQuery` is deliberately absent: its failure must not stop bootstrap.
     error: userQuery.error ?? companyQuery.error,
     context: useSessionStore((s) => s.context),
   }

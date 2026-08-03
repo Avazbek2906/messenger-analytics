@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/router/routes'
 import { useConversations, type Conversation } from '@/entities/conversation'
+import { useSession } from '@/entities/session'
 import type { ConversationFilterState } from '@/features/conversation-filters'
 import { useTranslation } from '@/shared/i18n'
 import { formatNumber } from '@/shared/lib'
@@ -31,9 +32,11 @@ export function ConversationTable({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const session = useSession()
   const query = useConversations(filters.params)
 
-  const columns = useMemo(() => buildConversationColumns(t), [t])
+  const mode = session.company?.attribution_mode
+  const columns = useMemo(() => buildConversationColumns(t, mode), [t, mode])
 
   const total = query.data?.count ?? 0
   const rows = query.data?.results ?? []

@@ -4,6 +4,8 @@ export type {
   ConversationFilters,
   OverridePayload,
 } from './api/conversation-api'
+export { attributionGap, attributionGapHintKey } from './model/attribution'
+export type { AttributionGap } from './model/attribution'
 export {
   AGREEMENT_TONES,
   CHANNEL_COLORS,

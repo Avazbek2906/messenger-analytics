@@ -71,9 +71,8 @@ t(‘coverage.partial’, { percent: ‘89,3%’, pending: ‘137’ })
 - Til almashganda daraxt `key` orqali qayta yig’iladi — format qoldiqlari
   ekranda qolib ketmasligi uchun.
 
-> Hozircha uchala lug’at ham entry chunk’ga kiradi (~11 kB gz). Kalitlar soni
-> sezilarli o’sib, bu 40 kB gz dan oshsa — `import.meta.glob` bilan tilga qarab
-> lazy yuklashga o’tiladi.
+> `uz` entry chunk’da (standart til — unga loading holati kerak emas), `ru` va
+> `en` esa alohida chunk sifatida talab bo’yicha yuklanadi.
 
 ## Backend bilan ishlashning qat’iy qoidalari
 
@@ -86,3 +85,7 @@ Bular bir marta `shared/` da kodlangan va qayta yozilmasligi kerak:
 5. **`null` ≠ `0`** — `—` ko‘rsatiladi, chart chizig‘i uziladi.
 6. Dashboard 120 s serverda keshlanadi — tuzatishdan keyin darhol refetch qilinmaydi.
 7. Audio va Excel yuklab olish JWT talab qiladi → `fetch` → `blob`.
+8. Parol **bir marta** qaytariladi (`invite`, `reset-password`, employee +
+   `account`) — qayta o‘qib bo‘lmaydi, `CredentialsDialog` orqali ko‘rsatiladi.
+9. **Ochiq suhbat** (`closed_at === null`) keshlanmaydi: atribut oxirgi
+   jo‘natuvchi bo‘yicha suhbat davomida o‘zgarishi mumkin.

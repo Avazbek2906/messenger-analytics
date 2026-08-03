@@ -13,6 +13,7 @@ export const uz = {
   'common.apply': 'Qo‘llash',
   'common.cancel': 'Bekor qilish',
   'common.close': 'Yopish',
+  'common.copied': 'Nusxalandi',
   'common.noData': 'Ma’lumot yo‘q',
   'common.outOf100': '/ 100',
 
@@ -996,6 +997,76 @@ export const uz = {
   'exportStatus.running': 'Tayyorlanmoqda',
   'exportStatus.done': 'Tayyor',
   'exportStatus.error': 'Xatolik',
+
+  /* ------------------------------------------- Logins and passwords */
+
+  'settings.account': 'Login va parol',
+  'account.identity': 'Mening akkauntim',
+  'account.identityDescription': 'Tizimga qaysi login bilan kirgansiz.',
+  'account.logins': 'Loginlar',
+  'account.loginsDescription': 'Kompaniya uchun yangi login yaratish.',
+  'account.loginsHint':
+    'Loginlar ro‘yxatini qaytaradigan API yo‘q, shuning uchun bu yerda faqat yangisini yaratasiz. Mavjud loginning parolini «Xodimlar» bo‘limidan tiklaysiz.',
+
+  'user.username': 'Login',
+  'user.usernameHint': 'Butun platforma bo‘yicha takrorlanmas bo‘lishi shart.',
+  'user.name': 'To‘liq ism',
+  'user.firstName': 'Ism',
+  'user.lastName': 'Familiya',
+  'user.role': 'Rol',
+  'user.roleHint': 'Faqat o‘zingiz bera oladigan rollar ko‘rsatiladi.',
+  'user.passwordHint': 'Bo‘sh qoldirsangiz, tizim o‘zi yaratib beradi.',
+  'user.passwordPlaceholder': 'Avtomatik yaratiladi',
+  'user.cabinet': 'Kabinet',
+  'user.cabinetLinked': 'Xodim profiliga bog‘langan',
+  'user.cabinetMissing': 'Bog‘lanmagan',
+
+  'credentials.title': 'Login tayyor',
+  'credentials.description':
+    'Parol faqat shu yerda va faqat bir marta ko‘rsatiladi.',
+  'credentials.username': 'Login',
+  'credentials.password': 'Parol',
+  'credentials.copyUsername': 'Loginni nusxalash',
+  'credentials.copyPassword': 'Parolni nusxalash',
+  'credentials.warning':
+    'Oynani yopganingizdan keyin parolni qayta ko‘rish imkoni yo‘q. Hozir nusxalab, xodimga yetkazing.',
+  'credentials.saved': 'Nusxalab oldim',
+
+  'inviteUser.title': 'Yangi login',
+  'inviteUser.description':
+    'Kompaniyangiz uchun login yaratadi. Parol bir marta ko‘rsatiladi.',
+  'inviteUser.submit': 'Login yaratish',
+  'inviteUser.employee': 'Xodim',
+  'inviteUser.employeeHint':
+    'Xodimga bog‘lansa, unga shaxsiy kabinet va brauzer kengaytmasi ochiladi.',
+  'inviteUser.noEmployee': 'Bog‘lanmasin',
+
+  'resetPassword.title': 'Parolni tiklash',
+  'resetPassword.description': '{name} uchun yangi parol o‘rnatiladi.',
+  'resetPassword.submit': 'Parolni tiklash',
+  'resetPassword.newPassword': 'Yangi parol',
+  'resetPassword.newPasswordHint':
+    'Bo‘sh qoldirsangiz, tizim o‘zi yaratib beradi.',
+  'resetPassword.sessionsNote':
+    'Parolni tiklash ochiq sessiyalarni to‘xtatmaydi — eski token yana 5 kungacha amal qiladi.',
+
+  'changePassword.title': 'Parolni o‘zgartirish',
+  'changePassword.description': 'O‘z parolingizni o‘zgartirasiz.',
+  'changePassword.current': 'Joriy parol',
+  'changePassword.new': 'Yangi parol',
+  'changePassword.confirm': 'Yangi parolni takrorlang',
+  'changePassword.mismatch': 'Parollar mos kelmadi.',
+  'changePassword.unchanged': 'Yangi parol joriysi bilan bir xil.',
+  'changePassword.submit': 'O‘zgartirish',
+  'changePassword.success': 'Parol o‘zgartirildi.',
+
+  'employeeForm.createLogin': 'Login ham yaratilsin',
+  'employeeForm.createLoginHint':
+    'Xodim va uning logini bitta amalda yaratiladi. Keyinroq bu oynadan login qo‘shib bo‘lmaydi.',
+
+  'conversationTable.extensionSilent': 'Kengaytma ishlamagan',
+  'conversationTable.extensionSilentHint':
+    'Suhbatga javob berilgan, lekin kengaytma birorta jo‘natishni qayd etmagan — xodim uni yoqmagan bo‘lishi mumkin.',
 } satisfies Record<string, Message>
 
 export type MessageKey = keyof typeof uz

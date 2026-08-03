@@ -14,7 +14,7 @@ vi.mock('../api/session-api', () => ({
   sessionApi: {
     me: vi.fn(),
     company: vi.fn(),
-    employeeIdentity: vi.fn(),
+    hasCabinet: vi.fn(),
     login: vi.fn(),
     updateCompany: vi.fn(),
   },
@@ -61,11 +61,7 @@ afterEach(() => {
 
 describe('useSessionBootstrap', () => {
   it('opens the cabinet when an employee profile exists', async () => {
-    vi.mocked(sessionApi.employeeIdentity).mockResolvedValue({
-      employee_id: 'e1',
-      full_name: 'Aziza Karimova',
-      company: 'Kotib Savdo',
-    })
+    vi.mocked(sessionApi.hasCabinet).mockResolvedValue(true)
 
     const { result } = renderHook(() => useSessionBootstrap(), { wrapper })
 
@@ -77,7 +73,7 @@ describe('useSessionBootstrap', () => {
     // The backend may answer `403` here instead of the documented
     // `400 no_employee_profile`. That must not turn the whole app into
     // "Access denied" — the probe is only a UI hint.
-    vi.mocked(sessionApi.employeeIdentity).mockRejectedValue(
+    vi.mocked(sessionApi.hasCabinet).mockRejectedValue(
       new ApiError(403, {
         type: 'client_error',
         errors: [

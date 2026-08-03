@@ -1,25 +1,34 @@
 import { AlertTriangle, CircleDot } from 'lucide-react'
 
 import {
+  attributionGap,
+  attributionGapHintKey,
   ChannelIcon,
   OutcomeBadge,
   ScoreValue,
   SentimentBadge,
   type Conversation,
 } from '@/entities/conversation'
+import type { AttributionMode } from '@/entities/session'
 import type { TranslateFn } from '@/shared/i18n'
 import { DASH, formatDateTime, formatDuration, orDash } from '@/shared/lib'
 import type { Column } from '@/shared/ui/data/data-table'
 import { Tooltip } from '@/shared/ui/primitives/tooltip'
 
 /**
- * Jadval ustunlari.
+ * The table columns.
  *
  * Kept in its own file: the column list is long and evolves independently of
  * the table composition.
+ *
+ * `attributionMode` is company-level and only affects the wording of the
+ * unassigned hint — under mode 3 an empty `attribution_source` on a
+ * conversation somebody replied to means the extension was off, which is a
+ * different problem from "no rule matched" (CHANGELOG §4).
  */
 export function buildConversationColumns(
   t: TranslateFn,
+  attributionMode: AttributionMode | undefined,
 ): Column<Conversation>[] {
   return [
     {
@@ -46,16 +55,25 @@ export function buildConversationColumns(
       key: 'employee',
       header: t('conversationTable.employee'),
       hideBelow: 'md',
-      cell: (row) =>
-        row.employee_name ? (
-          <span className="truncate text-fg-muted">{row.employee_name}</span>
-        ) : (
-          <Tooltip content={t('conversationTable.unassignedHint')}>
+      cell: (row) => {
+        if (row.employee_name) {
+          return (
+            <span className="truncate text-fg-muted">{row.employee_name}</span>
+          )
+        }
+        const gap = attributionGap(row, attributionMode)
+        return (
+          <Tooltip content={t(attributionGapHintKey(gap))}>
             <span className="cursor-help text-warning-fg">
-              {t('conversationTable.unassigned')}
+              {t(
+                gap === 'extension_silent'
+                  ? 'conversationTable.extensionSilent'
+                  : 'conversationTable.unassigned',
+              )}
             </span>
           </Tooltip>
-        ),
+        )
+      },
     },
     {
       key: 'score',

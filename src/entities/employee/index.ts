@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
+import type { Credentials, EmployeeAccountInput } from '@/entities/user'
 import {
   http,
   queryKeys,
@@ -23,8 +24,13 @@ export interface Employee {
   department: string
   is_active: boolean
   working_hours: WorkingHoursEntry[] | null
-  /** Link to a dashboard user — read-only over the API. */
+  /** Link to a dashboard user — this is what opens the cabinet and extension. */
   user: UUID | null
+  /**
+   * The one-time password, present ONLY on a create response that carried
+   * `account`; `null` everywhere else. It is never returned again.
+   */
+  credentials: Credentials | null
   created_at: ApiDateTime
 }
 
@@ -35,7 +41,21 @@ export interface EmployeeInput {
   is_active?: boolean
   /** `null` or `[]` clears the schedule. */
   working_hours?: WorkingHoursEntry[] | null
+  /**
+   * Creates the employee AND their login in one transaction. Mutually
+   * exclusive with `user` (`400 user_and_account`).
+   *
+   * CREATE ONLY: the schema advertises it on `PUT`/`PATCH` too, but updates
+   * ignore it silently — no login, no error. `EmployeeUpdateInput` therefore
+   * strips it (CHANGELOG 2026-08-02 §1).
+   */
+  account?: EmployeeAccountInput
+  /** Links an EXISTING login instead of creating one. */
+  user?: UUID | null
 }
+
+/** Updates cannot carry `account` — see the note above. */
+export type EmployeeUpdateInput = Partial<Omit<EmployeeInput, 'account'>>
 
 export interface EmployeeFilters {
   is_active?: boolean
@@ -52,7 +72,7 @@ export const employeeApi = {
   create: (input: EmployeeInput) =>
     http.post<Employee>('companies/employees', input),
 
-  update: (id: UUID, input: Partial<EmployeeInput>) =>
+  update: (id: UUID, input: EmployeeUpdateInput) =>
     http.patch<Employee>(`companies/employees/${id}`, input),
 
   /** Hard delete — prefer `update({ is_active: false })` for someone who left. */
@@ -87,7 +107,7 @@ export function useCreateEmployee() {
 export function useUpdateEmployee() {
   const invalidate = useInvalidateEmployees()
   return useMutation({
-    mutationFn: ({ id, input }: { id: UUID; input: Partial<EmployeeInput> }) =>
+    mutationFn: ({ id, input }: { id: UUID; input: EmployeeUpdateInput }) =>
       employeeApi.update(id, input),
     onSuccess: invalidate,
   })

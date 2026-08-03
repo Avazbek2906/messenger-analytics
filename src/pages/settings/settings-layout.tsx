@@ -1,4 +1,4 @@
-import { Building2, Package, Plug, Users } from 'lucide-react'
+import { Building2, KeyRound, Package, Plug, Users } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { ROUTES } from '@/app/router/routes'
@@ -11,6 +11,7 @@ import { Badge } from '@/shared/ui/primitives/badge'
 
 const TABS = [
   { to: ROUTES.settingsCompany, labelKey: 'settings.company', icon: Building2 },
+  { to: ROUTES.settingsAccount, labelKey: 'settings.account', icon: KeyRound },
   { to: ROUTES.settingsEmployees, labelKey: 'settings.employees', icon: Users },
   { to: ROUTES.settingsCatalog, labelKey: 'settings.catalog', icon: Package },
   {

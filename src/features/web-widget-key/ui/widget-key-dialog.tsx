@@ -1,7 +1,7 @@
-import { AlertTriangle, Check, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { AlertTriangle } from 'lucide-react'
 
 import { useTranslation } from '@/shared/i18n'
+import { SecretField } from '@/shared/ui/data/secret-field'
 import { Button } from '@/shared/ui/primitives/button'
 import { Dialog } from '@/shared/ui/primitives/dialog'
 
@@ -21,18 +21,6 @@ export function WidgetKeyDialog({
   onClose: () => void
 }) {
   const { t } = useTranslation()
-  const [copied, setCopied] = useState(false)
-
-  const copy = async () => {
-    if (!widgetKey) return
-    try {
-      await navigator.clipboard.writeText(widgetKey)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      /* clipboard blocked — the key is selectable on screen anyway */
-    }
-  }
 
   return (
     <Dialog
@@ -49,19 +37,9 @@ export function WidgetKeyDialog({
       }
     >
       <div className="space-y-4">
-        <div className="flex items-center gap-2 rounded-lg bg-surface-sunken px-3 py-2.5">
-          <code className="min-w-0 flex-1 font-mono text-[13px] break-all text-fg">
-            {widgetKey}
-          </code>
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            aria-label={t('web.copyKey')}
-            onClick={() => void copy()}
-          >
-            {copied ? <Check className="text-success" /> : <Copy />}
-          </Button>
-        </div>
+        {widgetKey ? (
+          <SecretField value={widgetKey} copyLabel={t('web.copyKey')} />
+        ) : null}
 
         <p className="flex items-start gap-2 rounded-md bg-danger-soft px-3 py-2.5 text-xs leading-5 text-danger-fg">
           <AlertTriangle className="mt-px size-3.5 shrink-0" aria-hidden />

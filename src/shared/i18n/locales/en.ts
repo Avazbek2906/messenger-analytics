@@ -7,6 +7,7 @@ export const en: Messages = {
   'common.apply': 'Apply',
   'common.cancel': 'Cancel',
   'common.close': 'Close',
+  'common.copied': 'Copied',
   'common.noData': 'No data',
   'common.outOf100': '/ 100',
 
@@ -990,4 +991,75 @@ export const en: Messages = {
   'exportStatus.running': 'Building',
   'exportStatus.done': 'Ready',
   'exportStatus.error': 'Error',
+
+  /* ---------------------------------------------- Logins & passwords */
+
+  'settings.account': 'Login & password',
+  'account.identity': 'My account',
+  'account.identityDescription': 'The login you are signed in with.',
+  'account.logins': 'Logins',
+  'account.loginsDescription': 'Create a login for the company.',
+  'account.loginsHint':
+    'There is no API that lists logins, so this only creates new ones. An existing login’s password is reset from the Employees section.',
+
+  'user.username': 'Username',
+  'user.usernameHint': 'Must be unique across the whole platform.',
+  'user.name': 'Full name',
+  'user.firstName': 'First name',
+  'user.lastName': 'Last name',
+  'user.role': 'Role',
+  'user.roleHint': 'Only the roles you are allowed to grant are listed.',
+  'user.passwordHint': 'Leave empty and one will be generated for you.',
+  'user.passwordPlaceholder': 'Will be generated',
+  'user.cabinet': 'Cabinet',
+  'user.cabinetLinked': 'Linked to an employee profile',
+  'user.cabinetMissing': 'Not linked',
+
+  'credentials.title': 'Login created',
+  'credentials.description':
+    'The password is shown here, once, and never again.',
+  'credentials.username': 'Username',
+  'credentials.password': 'Password',
+  'credentials.copyUsername': 'Copy username',
+  'credentials.copyPassword': 'Copy password',
+  'credentials.warning':
+    'Once you close this dialog the password cannot be read back. Copy it now and hand it over.',
+  'credentials.saved': 'I’ve copied it',
+
+  'inviteUser.title': 'New login',
+  'inviteUser.description':
+    'Creates a login inside your company. The password is shown once.',
+  'inviteUser.submit': 'Create login',
+  'inviteUser.employee': 'Employee',
+  'inviteUser.employeeHint':
+    'Linking an employee is what opens their personal cabinet and the browser extension.',
+  'inviteUser.noEmployee': 'No link',
+
+  'resetPassword.title': 'Reset password',
+  'resetPassword.description': 'A new password will be set for {name}.',
+  'resetPassword.submit': 'Reset password',
+  'resetPassword.newPassword': 'New password',
+  'resetPassword.newPasswordHint':
+    'Leave empty and one will be generated for you.',
+  'resetPassword.sessionsNote':
+    'A reset does not end open sessions — the old token stays valid for up to 5 more days.',
+
+  'changePassword.title': 'Change password',
+  'changePassword.description': 'You are changing your own password.',
+  'changePassword.current': 'Current password',
+  'changePassword.new': 'New password',
+  'changePassword.confirm': 'Repeat the new password',
+  'changePassword.mismatch': 'The passwords do not match.',
+  'changePassword.unchanged':
+    'The new password is the same as the current one.',
+  'changePassword.submit': 'Change',
+  'changePassword.success': 'Password changed.',
+
+  'employeeForm.createLogin': 'Create a login too',
+  'employeeForm.createLoginHint':
+    'The employee and their login are created in one operation. A login cannot be added from this dialog later.',
+
+  'conversationTable.extensionSilent': 'Extension was off',
+  'conversationTable.extensionSilentHint':
+    'Someone replied in this conversation, but the extension reported no sends at all — it was probably not running.',
 }

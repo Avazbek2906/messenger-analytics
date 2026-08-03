@@ -1,4 +1,4 @@
-import { Pencil, Plus, Search } from 'lucide-react'
+import { KeyRound, Pencil, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import {
@@ -9,6 +9,7 @@ import {
 } from '@/entities/employee'
 import { useSession } from '@/entities/session'
 import { EmployeeDialog } from '@/features/employee-form'
+import { ResetPasswordDialog } from '@/features/reset-password'
 import { useDebouncedValue } from '@/shared/hooks/use-debounced-value'
 import { useTranslation } from '@/shared/i18n'
 import { formatNumber } from '@/shared/lib'
@@ -36,6 +37,7 @@ export function EmployeesTable() {
   const debouncedSearch = useDebouncedValue(search)
   const [editing, setEditing] = useState<Employee | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [resetting, setResetting] = useState<Employee | null>(null)
 
   const query = useEmployees({
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -108,20 +110,35 @@ export function EmployeesTable() {
       {
         key: 'actions',
         header: '',
-        className: 'w-12',
+        className: 'w-20',
         cell: (row) =>
           session.canWrite ? (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t('employeeForm.editTitle')}
-              onClick={() => {
-                setEditing(row)
-                setDialogOpen(true)
-              }}
-            >
-              <Pencil />
-            </Button>
+            <div className="flex justify-end gap-0.5">
+              {/* A password can only be reset for someone who HAS a login —
+                  `user` is the uuid the endpoint takes, and it is the user's,
+                  not the employee's (CHANGELOG §2). */}
+              {row.user ? (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t('resetPassword.title')}
+                  onClick={() => setResetting(row)}
+                >
+                  <KeyRound />
+                </Button>
+              ) : null}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t('employeeForm.editTitle')}
+                onClick={() => {
+                  setEditing(row)
+                  setDialogOpen(true)
+                }}
+              >
+                <Pencil />
+              </Button>
+            </div>
           ) : null,
       },
     ],
@@ -196,6 +213,14 @@ export function EmployeesTable() {
         departments={departments}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <ResetPasswordDialog
+        userId={resetting?.user ?? null}
+        subject={resetting?.full_name ?? ''}
+        onOpenChange={(open) => {
+          if (!open) setResetting(null)
+        }}
       />
     </Card>
   )

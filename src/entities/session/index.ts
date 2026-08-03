@@ -1,5 +1,4 @@
 export { sessionApi } from './api/session-api'
-export type { EmployeeIdentity } from './api/session-api'
 export {
   attributionModeLabelKey,
   buildSessionContext,

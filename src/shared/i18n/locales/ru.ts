@@ -7,6 +7,7 @@ export const ru: Messages = {
   'common.apply': 'Применить',
   'common.cancel': 'Отмена',
   'common.close': 'Закрыть',
+  'common.copied': 'Скопировано',
   'common.noData': 'Нет данных',
   'common.outOf100': '/ 100',
 
@@ -986,4 +987,74 @@ export const ru: Messages = {
   'exportStatus.running': 'Собирается',
   'exportStatus.done': 'Готов',
   'exportStatus.error': 'Ошибка',
+
+  /* ------------------------------------------------- Логины и пароли */
+
+  'settings.account': 'Логин и пароль',
+  'account.identity': 'Мой аккаунт',
+  'account.identityDescription': 'Под каким логином вы вошли в систему.',
+  'account.logins': 'Логины',
+  'account.loginsDescription': 'Создание логина для компании.',
+  'account.loginsHint':
+    'API со списком логинов нет, поэтому здесь можно только создать новый. Пароль существующего логина сбрасывается в разделе «Сотрудники».',
+
+  'user.username': 'Логин',
+  'user.usernameHint': 'Должен быть уникальным в рамках всей платформы.',
+  'user.name': 'Полное имя',
+  'user.firstName': 'Имя',
+  'user.lastName': 'Фамилия',
+  'user.role': 'Роль',
+  'user.roleHint': 'Показаны только те роли, которые вы вправе выдать.',
+  'user.passwordHint': 'Оставьте пустым — система сгенерирует пароль сама.',
+  'user.passwordPlaceholder': 'Будет сгенерирован',
+  'user.cabinet': 'Кабинет',
+  'user.cabinetLinked': 'Связан с профилем сотрудника',
+  'user.cabinetMissing': 'Не связан',
+
+  'credentials.title': 'Логин создан',
+  'credentials.description':
+    'Пароль показывается только здесь и только один раз.',
+  'credentials.username': 'Логин',
+  'credentials.password': 'Пароль',
+  'credentials.copyUsername': 'Скопировать логин',
+  'credentials.copyPassword': 'Скопировать пароль',
+  'credentials.warning':
+    'После закрытия окна пароль посмотреть уже нельзя. Скопируйте его сейчас и передайте сотруднику.',
+  'credentials.saved': 'Скопировал',
+
+  'inviteUser.title': 'Новый логин',
+  'inviteUser.description':
+    'Создаёт логин в вашей компании. Пароль будет показан один раз.',
+  'inviteUser.submit': 'Создать логин',
+  'inviteUser.employee': 'Сотрудник',
+  'inviteUser.employeeHint':
+    'Связь с сотрудником открывает ему личный кабинет и расширение для браузера.',
+  'inviteUser.noEmployee': 'Без привязки',
+
+  'resetPassword.title': 'Сброс пароля',
+  'resetPassword.description': 'Будет установлен новый пароль для {name}.',
+  'resetPassword.submit': 'Сбросить пароль',
+  'resetPassword.newPassword': 'Новый пароль',
+  'resetPassword.newPasswordHint':
+    'Оставьте пустым — система сгенерирует пароль сама.',
+  'resetPassword.sessionsNote':
+    'Сброс пароля не завершает открытые сессии — старый токен действует ещё до 5 дней.',
+
+  'changePassword.title': 'Смена пароля',
+  'changePassword.description': 'Вы меняете собственный пароль.',
+  'changePassword.current': 'Текущий пароль',
+  'changePassword.new': 'Новый пароль',
+  'changePassword.confirm': 'Повторите новый пароль',
+  'changePassword.mismatch': 'Пароли не совпадают.',
+  'changePassword.unchanged': 'Новый пароль совпадает с текущим.',
+  'changePassword.submit': 'Изменить',
+  'changePassword.success': 'Пароль изменён.',
+
+  'employeeForm.createLogin': 'Создать также логин',
+  'employeeForm.createLoginHint':
+    'Сотрудник и его логин создаются одной операцией. Позже добавить логин из этого окна уже нельзя.',
+
+  'conversationTable.extensionSilent': 'Расширение молчало',
+  'conversationTable.extensionSilentHint':
+    'В диалоге был ответ, но расширение не зафиксировало ни одной отправки — вероятно, сотрудник его не включил.',
 }

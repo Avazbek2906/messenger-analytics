@@ -14,6 +14,7 @@ export const queryKeys = {
   session: {
     me: () => ['session', 'me'] as const,
     company: () => ['session', 'company'] as const,
+    cabinet: () => ['session', 'cabinet'] as const,
   },
 
   employees: {

@@ -13,7 +13,23 @@ import {
   type ConversationFilters,
   type OverridePayload,
 } from '../api/conversation-api'
-import type { ConversationDetail } from './types'
+import type { Conversation, ConversationDetail } from './types'
+
+const CLOSED_STALE_TIME = 30_000
+
+/**
+ * A closed conversation is immutable enough to cache; an OPEN one is not.
+ *
+ * Attribution is last-outbound-wins and now lands mid-conversation, so when a
+ * colleague takes a chat over it moves to them on their first send. Caching
+ * `employee` across a poll would show the wrong person for as long as the
+ * cache lives (CHANGELOG 2026-08-02 §4).
+ */
+function staleTimeFor(
+  rows: readonly Pick<Conversation, 'closed_at'>[],
+): number {
+  return rows.some((row) => row.closed_at === null) ? 0 : CLOSED_STALE_TIME
+}
 
 export function useConversations(filters: ConversationFilters) {
   return useQuery({
@@ -22,7 +38,7 @@ export function useConversations(filters: ConversationFilters) {
     // Keeps the table populated while a new page loads — the old data stays
     // until the new one arrives.
     placeholderData: keepPreviousData,
-    staleTime: 30_000,
+    staleTime: (query) => staleTimeFor(query.state.data?.results ?? []),
   })
 }
 
@@ -30,7 +46,8 @@ export function useConversation(id: UUID) {
   return useQuery({
     queryKey: queryKeys.conversations.detail(id),
     queryFn: () => conversationApi.detail(id),
-    staleTime: 30_000,
+    staleTime: (query) =>
+      staleTimeFor(query.state.data ? [query.state.data] : []),
   })
 }
 

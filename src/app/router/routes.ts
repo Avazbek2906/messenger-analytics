@@ -14,6 +14,7 @@ export const ROUTES = {
   cabinet: '/me',
   settings: '/settings',
   settingsCompany: '/settings/company',
+  settingsAccount: '/settings/account',
   settingsEmployees: '/settings/employees',
   settingsCatalog: '/settings/catalog',
   settingsIntegrations: '/settings/integrations',

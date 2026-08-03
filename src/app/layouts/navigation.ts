@@ -16,7 +16,7 @@ import type { MessageKey } from '@/shared/i18n'
 
 export interface NavItem {
   to: string
-  /** Tarjima kaliti — matn komponentda `t()` orqali olinadi. */
+  /** Translation key — the text itself comes from `t()` in the component. */
   labelKey: MessageKey
   icon: LucideIcon
   /** Only for users who may read company dashboards. */
