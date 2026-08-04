@@ -7,7 +7,7 @@ import {
   useAskAi,
   type AskResponse,
 } from '@/entities/insight'
-import type { PeriodParams } from '@/shared/api'
+import { ApiError, type PeriodParams } from '@/shared/api'
 import { useTranslation } from '@/shared/i18n'
 import { Button } from '@/shared/ui/primitives/button'
 import { Card, CardBody, CardHeader } from '@/shared/ui/primitives/card'
@@ -104,8 +104,15 @@ export function AskPanel({ period }: { period: PeriodParams }) {
         ) : null}
 
         {ask.isError ? (
+          // A 503 says the model was busy, not that the question was wrong —
+          // and `/ask` is never auto-retried (it is the heaviest read in the
+          // API), so the user is told to press the button again themselves.
           <p role="alert" className="text-[13px] text-danger-fg">
-            {t('ask.failed')}
+            {t(
+              ask.error instanceof ApiError && ask.error.isAiUnavailable
+                ? 'ask.busy'
+                : 'ask.failed',
+            )}
           </p>
         ) : null}
 

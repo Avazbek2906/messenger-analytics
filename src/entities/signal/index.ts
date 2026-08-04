@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 
 import { http, queryKeys, type PeriodParams, type UUID } from '@/shared/api'
@@ -31,6 +36,9 @@ export function useSignals(params: PeriodParams) {
     queryKey: queryKeys.dashboard.signals(params),
     queryFn: () => signalApi.list(params),
     staleTime: 120_000,
+    // Period-keyed like every other aggregate: hold the previous queues while
+    // the new window loads rather than emptying the panel (guide §8).
+    placeholderData: keepPreviousData,
     refetchInterval: () =>
       document.visibilityState === 'visible' ? 120_000 : false,
   })

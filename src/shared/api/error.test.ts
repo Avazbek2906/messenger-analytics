@@ -56,6 +56,26 @@ describe('ApiError', () => {
     expect(roleDenied.isMissingCompany).toBe(false)
   })
 
+  it('separates a busy model from an unconfigured one', () => {
+    // Both come from the same two endpoints, but one is worth retrying and the
+    // other never will be (CHANGELOG §5).
+    const busy = new ApiError(503, {
+      type: 'server_error',
+      errors: [
+        { code: 'ai_unavailable', detail: 'Upstream failed.', attr: null },
+      ],
+    })
+    const unconfigured = new ApiError(400, {
+      type: 'client_error',
+      errors: [
+        { code: 'gemini_not_configured', detail: 'No API key.', attr: null },
+      ],
+    })
+
+    expect(busy.isAiUnavailable).toBe(true)
+    expect(unconfigured.isAiUnavailable).toBe(false)
+  })
+
   it('survives an empty response body', () => {
     const error = new ApiError(500, null)
 

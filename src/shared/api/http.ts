@@ -32,6 +32,17 @@ interface RequestOptions {
 
 const DEFAULT_TIMEOUT_MS = 30_000
 
+/**
+ * We are a bearer-token client, never a browser session.
+ *
+ * If the browser holds a Django `/admin` session cookie for this domain and we
+ * send it, DRF may authenticate THAT session instead of the token and answer
+ * for the wrong user. The server now prefers the `Authorization` header, but
+ * omitting cookies removes the question entirely — and keeps it removed if the
+ * API ever moves to our own origin (guide §2).
+ */
+const OMIT_COOKIES = 'omit' as const
+
 /** Only one refresh request is ever in flight. */
 let refreshPromise: Promise<string> | null = null
 
@@ -68,6 +79,7 @@ async function refreshAccessToken(): Promise<string> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh }),
+      credentials: OMIT_COOKIES,
     })
 
     if (!response.ok) {
@@ -121,6 +133,7 @@ async function send(
       headers,
       body: formData ?? (body === undefined ? null : JSON.stringify(body)),
       signal: composedSignal,
+      credentials: OMIT_COOKIES,
     })
   } catch (cause) {
     if (signal?.aborted) throw cause

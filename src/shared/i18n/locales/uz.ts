@@ -207,7 +207,13 @@ export const uz = {
   'trend.day': 'Kunlik',
   'trend.week': 'Haftalik',
   'trend.legend.volume': 'Suhbatlar soni',
-  'trend.legend.score': 'O‘rtacha ball (o‘ng o‘q)',
+  'trend.legend.score': 'O‘rtacha ball (0–100)',
+  'trend.a11y.volume':
+    'Suhbatlar soni grafigi: {count} ta nuqta, eng yuqori qiymat {max}.',
+  'trend.a11y.score':
+    'O‘rtacha ball grafigi: eng past {min}, eng yuqori {max}.',
+  'trend.a11y.scoreEmpty':
+    'O‘rtacha ball grafigi: bu davrda hech bir suhbat baholanmagan.',
   'trend.tooLong.title': 'Davr juda uzun',
   'trend.tooLong.description':
     'Kunlik ko‘rinishda {max} tadan ortiq nuqta chiqadi. Haftalik guruhlashga o‘ting yoki davrni qisqartiring.',
@@ -613,6 +619,8 @@ export const uz = {
   'insights.title': 'AI izohi',
   'insights.failed':
     'Izohni olishning imkoni bo‘lmadi. Grafik esa joyida qoladi.',
+  'insights.busy':
+    'AI hozir band — bir lahzadan keyin qayta urinib ko‘ring. So‘rov to‘g‘ri edi.',
   'insights.caveat':
     'Bu — taxminlar, xulosa emas. Raqamlar serverda hisoblanadi, model faqat ularni izohlaydi.',
 
@@ -625,6 +633,8 @@ export const uz = {
   'ask.thinking': 'Javob tayyorlanmoqda — bu bir necha soniya olishi mumkin…',
   'ask.failed':
     'Javob olinmadi. Savolni qisqartirib yoki davrni toraytirib qayta urinib ko‘ring.',
+  'ask.busy':
+    'AI hozir band. Savolingiz to‘g‘ri — bir lahzadan keyin «So‘rash» tugmasini qayta bosing.',
   'ask.evidence': 'Javob asoslangan suhbatlar',
   'ask.scopeHint':
     'Model faqat shu davr statistikasini ko‘radi: yozishmalar matni ham, mijoz kontaktlari ham unga berilmaydi. Har bir savol mustaqil — oldingi savol eslab qolinmaydi.',

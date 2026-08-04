@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
 import {
   http,
@@ -133,6 +138,8 @@ export function useProducts(filters: ProductFilters = { is_active: true }) {
     queryKey: queryKeys.catalog.products(filters),
     queryFn: () => catalogApi.products({ limit: 100, ...filters }),
     staleTime: 10 * 60_000,
+    // Same as the roster: the filter is a search box.
+    placeholderData: keepPreviousData,
   })
 }
 

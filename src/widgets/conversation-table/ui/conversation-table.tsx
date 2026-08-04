@@ -9,6 +9,7 @@ import { useTranslation } from '@/shared/i18n'
 import { formatNumber } from '@/shared/lib'
 import { DataTable } from '@/shared/ui/data/data-table'
 import { Pagination } from '@/shared/ui/data/pagination'
+import { StaleOverlay } from '@/shared/ui/feedback/stale-overlay'
 import { EmptyState, ErrorState } from '@/shared/ui/feedback/states'
 import {
   Card,
@@ -76,14 +77,19 @@ export function ConversationTable({
         </CardBody>
       ) : (
         <>
-          <DataTable
-            columns={columns}
-            rows={rows}
-            getRowKey={(row: Conversation) => row.id}
-            isLoading={query.isPending}
-            caption={t('nav.conversations')}
-            onRowClick={(row) => navigate(ROUTES.conversation(row.id))}
-          />
+          {/* Filter and page changes keep the previous rows on screen — the
+              table dims instead of emptying, so a manager mid-scan does not
+              lose their place (guide §8). */}
+          <StaleOverlay stale={query.isPlaceholderData}>
+            <DataTable
+              columns={columns}
+              rows={rows}
+              getRowKey={(row: Conversation) => row.id}
+              isLoading={query.isPending}
+              caption={t('nav.conversations')}
+              onRowClick={(row) => navigate(ROUTES.conversation(row.id))}
+            />
+          </StaleOverlay>
 
           <CardFooter>
             <Pagination

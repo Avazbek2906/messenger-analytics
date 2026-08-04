@@ -196,7 +196,12 @@ export const en: Messages = {
   'trend.day': 'Daily',
   'trend.week': 'Weekly',
   'trend.legend.volume': 'Conversations',
-  'trend.legend.score': 'Average score (right axis)',
+  'trend.legend.score': 'Average score (0–100)',
+  'trend.a11y.volume':
+    'Conversation volume chart: {count} points, peaking at {max}.',
+  'trend.a11y.score': 'Average score chart: lowest {min}, highest {max}.',
+  'trend.a11y.scoreEmpty':
+    'Average score chart: nothing was scored in this period.',
   'trend.tooLong.title': 'Period is too long',
   'trend.tooLong.description':
     'Daily buckets would produce more than {max} points. Switch to weekly grouping or shorten the range.',
@@ -608,6 +613,8 @@ export const en: Messages = {
   'insights.title': 'AI insights',
   'insights.failed':
     'Could not fetch the narration. The chart itself is unaffected.',
+  'insights.busy':
+    'The AI is busy — try again in a moment. Your request was valid.',
   'insights.caveat':
     'These are hypotheses, not conclusions. The numbers are computed server-side; the model only narrates them.',
 
@@ -620,6 +627,8 @@ export const en: Messages = {
   'ask.thinking': 'Working on it — this can take a few seconds…',
   'ask.failed':
     'No answer came back. Try a shorter question or a narrower period.',
+  'ask.busy':
+    'The AI is busy. Your question was fine — press Ask again in a moment.',
   'ask.evidence': 'Conversations behind the answer',
   'ask.scopeHint':
     'The model sees only this period’s statistics — never message text or customer contact details. Every question is independent; the previous one is not remembered.',

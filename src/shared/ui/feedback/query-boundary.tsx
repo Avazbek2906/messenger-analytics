@@ -2,6 +2,7 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
 import { EmptyState, ErrorState } from './states'
+import { StaleOverlay } from './stale-overlay'
 
 interface QueryBoundaryProps<T> {
   query: UseQueryResult<T>
@@ -19,6 +20,11 @@ interface QueryBoundaryProps<T> {
  * This removes the `if (isLoading) … if (isError) …` chain that would otherwise
  * repeat in every widget, and guarantees that empty and error states look
  * identical app-wide.
+ *
+ * The fifth state is the one that decides how a dashboard FEELS: when the
+ * period changes, the previous numbers are held and dimmed instead of being
+ * replaced by a skeleton. Flashing every card back to grey on each filter
+ * change reads as "broken", not as "loading" (guide §8).
  */
 export function QueryBoundary<T>({
   query,
@@ -39,7 +45,14 @@ export function QueryBoundary<T>({
     return <>{empty ?? <EmptyState />}</>
   }
 
-  return <>{children(query.data)}</>
+  // `isPlaceholderData` is precisely "these are the PREVIOUS filter's numbers".
+  // A plain background refetch of the same key is not dimmed — the content is
+  // about to be identical, so dimming it would only flicker.
+  return (
+    <StaleOverlay stale={query.isPlaceholderData}>
+      {children(query.data)}
+    </StaleOverlay>
+  )
 }
 
 function defaultIsEmpty(data: unknown): boolean {

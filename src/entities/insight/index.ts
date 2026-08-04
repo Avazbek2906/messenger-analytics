@@ -84,6 +84,9 @@ export function clampAskPeriod(period: PeriodParams): PeriodParams {
   return { ...period, date_from: clamped.toISOString() }
 }
 
+/** Two extra attempts, backing off 2 s → 4 s. See `useWidgetInsights`. */
+const AI_RETRIES = 2
+
 /**
  * AI narration for one widget.
  *
@@ -91,6 +94,11 @@ export function clampAskPeriod(period: PeriodParams): PeriodParams {
  * is one LLM round-trip on the request thread. The wording changes once the
  * 120 s server cache expires even if the numbers did not, so the text is never
  * used as a React key (docs/06).
+ *
+ * `503 ai_unavailable` is retried with backoff because it is genuinely common
+ * on a tight quota and the request itself was fine; every other failure —
+ * including the permanent `gemini_not_configured` — is surfaced immediately
+ * (CHANGELOG §5).
  */
 export function useWidgetInsights(
   widget: InsightWidget,
@@ -113,7 +121,11 @@ export function useWidgetInsights(
     },
     enabled,
     staleTime: 120_000,
-    retry: false,
+    retry: (failureCount, error) =>
+      error instanceof ApiError &&
+      error.isAiUnavailable &&
+      failureCount < AI_RETRIES,
+    retryDelay: (attempt) => 2000 * 2 ** attempt,
   })
 }
 

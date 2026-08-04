@@ -1,4 +1,5 @@
 export { dashboardApi } from './api/dashboard-api'
+export { defaultGranularity } from './model/granularity'
 export type {
   EmployeeRatingParams,
   TimeseriesParams,

@@ -48,7 +48,9 @@ app → pages → widgets → features → entities → shared
 | `shared/` | HTTP client, UI kit, lib, hook’lar — domenga bog‘liq emas |
 
 To‘liq reja va bosqichlar: [`PLAN.md`](./PLAN.md).
-Backend API hujjatlari: [`docs/`](./docs/).
+Backend API hujjatlari: [`docs/frontend/`](./docs/frontend/) — kanonik nusxa.
+Avval [`00-integration-guide`](./docs/frontend/00-integration-guide.md), keyin
+[`CHANGELOG`](./docs/frontend/CHANGELOG.md), qolgani ma’lumotnoma sifatida.
 
 ## Ko’p tillilik
 
@@ -89,3 +91,6 @@ Bular bir marta `shared/` da kodlangan va qayta yozilmasligi kerak:
    `account`) — qayta o‘qib bo‘lmaydi, `CredentialsDialog` orqali ko‘rsatiladi.
 9. **Ochiq suhbat** (`closed_at === null`) keshlanmaydi: atribut oxirgi
    jo‘natuvchi bo‘yicha suhbat davomida o‘zgarishi mumkin.
+10. Cookie yuborilmaydi (`credentials: 'omit'`) — biz bearer-token klientmiz.
+11. Filtr o‘zgarganda skeleton ko‘rsatilmaydi: `keepPreviousData` + xiralashish
+    (`StaleOverlay`). Skeletonlar faqat **birinchi** yuklashda.

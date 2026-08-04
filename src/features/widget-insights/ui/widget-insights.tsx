@@ -6,7 +6,7 @@ import {
   useWidgetInsights,
   type InsightWidget,
 } from '@/entities/insight'
-import type { PeriodParams } from '@/shared/api'
+import { ApiError, type PeriodParams } from '@/shared/api'
 import { useTranslation } from '@/shared/i18n'
 import { Button } from '@/shared/ui/primitives/button'
 import { Skeleton } from '@/shared/ui/primitives/skeleton'
@@ -67,7 +67,16 @@ export function WidgetInsights({
         </div>
       ) : query.isError ? (
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[13px] text-fg-muted">{t('insights.failed')}</p>
+          {/* A 503 is upstream quota or a timeout, and the request itself was
+              valid — saying "try again in a moment" is both true and
+              actionable, where a generic failure message is neither. */}
+          <p className="text-[13px] text-fg-muted">
+            {t(
+              query.error instanceof ApiError && query.error.isAiUnavailable
+                ? 'insights.busy'
+                : 'insights.failed',
+            )}
+          </p>
           <Button
             size="sm"
             variant="ghost"

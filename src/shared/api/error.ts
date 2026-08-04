@@ -70,6 +70,17 @@ export class ApiError extends Error {
   get isRoleDenied(): boolean {
     return this.isForbidden && !this.isMissingCompany
   }
+
+  /**
+   * Gemini failed upstream — quota, a 5xx, a timeout, or output the schema
+   * rejected. The REQUEST WAS VALID, so the same one may be resent verbatim.
+   *
+   * This is the transient half of the AI error pair; `gemini_not_configured`
+   * is the permanent half and must never be retried (CHANGELOG §5).
+   */
+  get isAiUnavailable(): boolean {
+    return this.status === 503 || this.has('ai_unavailable')
+  }
 }
 
 /** Network failure / CORS / timeout — the server never answered. */

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import {
+  defaultGranularity,
   useTimeseries,
   type Granularity,
   type Timeseries,
@@ -16,7 +17,6 @@ import { Segmented } from '@/shared/ui/primitives/segmented'
 import { Skeleton } from '@/shared/ui/primitives/skeleton'
 
 import { TrendChart } from './trend-chart'
-import { TrendLegend } from './trend-legend'
 
 /**
  * Volume and quality trend.
@@ -27,7 +27,10 @@ import { TrendLegend } from './trend-legend'
  */
 export function TrendCard({ period }: { period: PeriodParams }) {
   const { t } = useTranslation()
-  const [granularity, setGranularity] = useState<Granularity>('day')
+  // `null` means "follow the window". An explicit pick sticks, so changing the
+  // period does not silently undo the grouping the user just chose.
+  const [chosen, setChosen] = useState<Granularity | null>(null)
+  const granularity = chosen ?? defaultGranularity(period)
   const query = useTimeseries({ ...period, granularity })
 
   const tooLong =
@@ -43,7 +46,7 @@ export function TrendCard({ period }: { period: PeriodParams }) {
             aria-label={t('trend.granularity')}
             size="sm"
             value={granularity}
-            onChange={setGranularity}
+            onChange={setChosen}
             options={[
               { value: 'day', label: t('trend.day') },
               { value: 'week', label: t('trend.week') },
@@ -62,7 +65,7 @@ export function TrendCard({ period }: { period: PeriodParams }) {
             action={
               <button
                 type="button"
-                onClick={() => setGranularity('week')}
+                onClick={() => setChosen('week')}
                 className="cursor-pointer text-sm font-medium text-primary hover:underline"
               >
                 {t('trend.tooLong.action')}
@@ -82,13 +85,7 @@ export function TrendCard({ period }: { period: PeriodParams }) {
             }
           >
             {(data) => (
-              <>
-                <TrendLegend />
-                <TrendChart
-                  series={data.series}
-                  granularity={data.granularity}
-                />
-              </>
+              <TrendChart series={data.series} granularity={data.granularity} />
             )}
           </QueryBoundary>
         )}

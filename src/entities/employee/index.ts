@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import type { Credentials, EmployeeAccountInput } from '@/entities/user'
@@ -90,6 +95,9 @@ export function useEmployees(filters: EmployeeFilters = { is_active: true }) {
     queryKey: queryKeys.employees.list(filters),
     queryFn: () => employeeApi.list({ limit: 100, ...filters }),
     staleTime: 5 * 60_000,
+    // Search changes the key on every debounced keystroke — hold the rows so
+    // the table dims rather than emptying between letters.
+    placeholderData: keepPreviousData,
   })
 }
 
