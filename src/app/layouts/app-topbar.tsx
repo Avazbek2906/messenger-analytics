@@ -1,6 +1,7 @@
 import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import type { ReactNode } from 'react'
 
+import { AskTrigger } from '@/features/ask-ai'
 import { useTranslation } from '@/shared/i18n'
 import { Button } from '@/shared/ui/primitives/button'
 
@@ -10,6 +11,9 @@ interface TopbarProps {
   collapsed: boolean
   onToggleCollapse: () => void
   onOpenMobileNav: () => void
+  askOpen: boolean
+  /** Omitted on pages with no period filter — the trigger then disappears. */
+  onToggleAsk?: () => void
   /** Pages drop their own controls here (period filter, export, …). */
   actions?: ReactNode
 }
@@ -24,6 +28,8 @@ export function AppTopbar({
   collapsed,
   onToggleCollapse,
   onOpenMobileNav,
+  askOpen,
+  onToggleAsk,
   actions,
 }: TopbarProps) {
   const { t } = useTranslation()
@@ -55,6 +61,9 @@ export function AppTopbar({
 
       <div className="ml-auto flex items-center gap-2">
         {actions}
+        {onToggleAsk ? (
+          <AskTrigger open={askOpen} onToggle={onToggleAsk} />
+        ) : null}
         <UserMenu />
       </div>
     </header>

@@ -1,14 +1,17 @@
 import { AlertTriangle, Lightbulb, Package, Tag } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import type { AnalysisResult } from '@/entities/conversation'
+import {
+  normalizeViolations,
+  type AnalysisResult,
+} from '@/entities/conversation'
 import { useTranslation } from '@/shared/i18n'
 import { Badge } from '@/shared/ui/primitives/badge'
 import { CardInset } from '@/shared/ui/primitives/card'
 
 /**
- * Tahlilning qolgan qismlari: qoida buzilishlari, mahsulotlar, ikkilamchi
- * sabablar va murabbiylik maslahati.
+ * The remaining parts of the analysis: rule violations, products, secondary
+ * reasons and the coaching note.
  *
  * Each section disappears entirely when empty — a panel padded with empty
  * headings only distracts.
@@ -16,19 +19,43 @@ import { CardInset } from '@/shared/ui/primitives/card'
 export function AnalysisDetails({ analysis }: { analysis: AnalysisResult }) {
   const { t } = useTranslation()
 
+  const violations = normalizeViolations(analysis.rule_violations)
+
   return (
     <div className="space-y-5">
       <Section
         icon={<AlertTriangle className="text-danger" />}
         title={t('conversation.violations')}
-        show={analysis.rule_violations.length > 0}
+        show={violations.length > 0}
       >
-        <ul className="flex flex-wrap gap-1.5">
-          {analysis.rule_violations.map((violation) => (
-            <li key={violation}>
-              <Badge tone="danger" size="sm">
-                {violation}
-              </Badge>
+        <ul className="space-y-3">
+          {violations.map((violation, index) => (
+            <li
+              key={`${violation.rule}-${index}`}
+              className="border-l-2 border-danger pl-3"
+            >
+              {violation.rule ? (
+                <Badge tone="danger" size="sm">
+                  {violation.rule}
+                </Badge>
+              ) : null}
+
+              {/* The explanation is what a manager coaches from; the code alone
+                  says nothing. Wrapped rather than truncated — this is the
+                  whole point of the section. */}
+              {violation.explanation ? (
+                <p className="mt-1.5 text-[13px] leading-6 text-fg">
+                  {violation.explanation}
+                </p>
+              ) : null}
+
+              {/* The quoted message that triggered it — evidence, so it is set
+                  apart from the model's own prose. */}
+              {violation.location ? (
+                <p className="mt-1 font-mono text-2xs leading-5 break-words text-fg-muted">
+                  {violation.location}
+                </p>
+              ) : null}
             </li>
           ))}
         </ul>

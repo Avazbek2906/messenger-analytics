@@ -131,6 +131,9 @@
   --spacing-sidebar: 16rem;
   --spacing-sidebar-collapsed: 4.5rem;
   --spacing-topbar: 4rem;
+  /* The Ask-AI dock. Wide enough for a readable answer, narrow enough that the
+     dashboard beside it keeps two chart columns. */
+  --spacing-ask-dock: 25rem;
 }
 
 /**

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import { tokenStore } from '@/shared/api'
 
+import { clearCabinetFlag } from './cabinet-cache'
 import type { SessionContext } from './types'
 
 interface SessionState {
@@ -30,6 +31,9 @@ export const useSessionStore = create<SessionState>((set) => ({
 
   signOut: () => {
     tokenStore.clear()
+    // Signing out is the user's own way to fix a stale cabinet flag — an admin
+    // may have linked them to an employee since the last probe.
+    clearCabinetFlag()
     set({ isAuthenticated: false, context: null })
   },
 }))

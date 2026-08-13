@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat /private/tmp/claude-502/-Users-avazbek-Desktop-Projects-messenger-analytics/d8b8d9a2-d8af-42ea-831f-9321b13fb944/scratchpad/access.txt)",
+      "Bash(curl -sS https://monitoring.jakhongir.dev/api/v1/chats/conversations/537a3780-1388-4838-9da6-aefd47d69377 -H 'Authorization: Bearer __CMDSUB_OUTPUT__' -o /private/tmp/claude-502/-Users-avazbek-Desktop-Projects-messenger-analytics/d8b8d9a2-d8af-42ea-831f-9321b13fb944/scratchpad/conv.json)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

@@ -1,6 +1,5 @@
 import { useSession } from '@/entities/session'
 import { PeriodFilter, usePeriod } from '@/features/period-filter'
-import { AskPanel } from '@/features/ask-ai'
 import { useDocumentTitle } from '@/shared/hooks/use-document-title'
 import { useTranslation } from '@/shared/i18n'
 import { PageHeader } from '@/shared/ui/layout/page-header'
@@ -49,8 +48,6 @@ export function DashboardPage() {
           <CriteriaCard period={period.params} />
           <FunnelCard period={period.params} />
         </div>
-
-        <AskPanel period={period.params} />
       </div>
     </>
   )

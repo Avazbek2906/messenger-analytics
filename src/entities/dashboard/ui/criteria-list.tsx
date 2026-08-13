@@ -4,13 +4,23 @@ import { criterionHintKey, criterionLabelKey } from '../model/labels'
 import type { CriterionStat } from '../model/types'
 import { useTranslation } from '@/shared/i18n'
 import { cn, formatScore } from '@/shared/lib'
-import { SCORE_BAND_COLORS, scoreBand } from '@/shared/ui/charts/chart-theme'
+import {
+  rubricBand,
+  rubricRatio,
+  SCORE_BAND_COLORS,
+} from '@/shared/ui/charts/chart-theme'
 import { Tooltip } from '@/shared/ui/primitives/tooltip'
 
 interface CriteriaListProps {
   title: string
   variant: 'strengths' | 'weaknesses'
   items: CriterionStat[]
+  /**
+   * The rubric's upper bound. Passed in rather than derived here so strengths
+   * and weaknesses share ONE denominator — deriving it per list would give the
+   * two columns different scales and make them incomparable.
+   */
+  scale: number
 }
 
 /**
@@ -19,7 +29,12 @@ interface CriteriaListProps {
  * Each row renders as a progress bar, but the score is also printed as text, so
  * the meaning survives even if colour is lost.
  */
-export function CriteriaList({ title, variant, items }: CriteriaListProps) {
+export function CriteriaList({
+  title,
+  variant,
+  items,
+  scale,
+}: CriteriaListProps) {
   const { t } = useTranslation()
   const Icon = variant === 'strengths' ? ThumbsUp : ThumbsDown
 
@@ -41,7 +56,7 @@ export function CriteriaList({ title, variant, items }: CriteriaListProps) {
       ) : (
         <ul className="space-y-3">
           {items.map((item) => (
-            <CriterionRow key={item.key} item={item} />
+            <CriterionRow key={item.key} item={item} scale={scale} />
           ))}
         </ul>
       )}
@@ -49,10 +64,14 @@ export function CriteriaList({ title, variant, items }: CriteriaListProps) {
   )
 }
 
-function CriterionRow({ item }: { item: CriterionStat }) {
+function CriterionRow({ item, scale }: { item: CriterionStat; scale: number }) {
   const { t } = useTranslation()
-  const band = scoreBand(item.avg_score)
-  const width = item.avg_score === null ? 0 : Math.max(item.avg_score, 2)
+  const band = rubricBand(item.avg_score, scale)
+  // A 2% floor keeps a non-null zero visible as a bar rather than as nothing.
+  const width =
+    item.avg_score === null
+      ? 0
+      : Math.max(rubricRatio(item.avg_score, scale) * 100, 2)
 
   return (
     <li className="space-y-1.5">

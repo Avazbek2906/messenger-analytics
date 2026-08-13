@@ -4,7 +4,8 @@ import { useEffect } from 'react'
 import { queryKeys, tokenStore } from '@/shared/api'
 
 import { sessionApi } from '../api/session-api'
-import { buildSessionContext } from './permissions'
+import { readCabinetFlag, writeCabinetFlag } from './cabinet-cache'
+import { buildSessionContext, isManagerRole } from './permissions'
 import { useSessionStore } from './session-store'
 import type { Company, CurrentUser, SessionContext } from './types'
 
@@ -42,21 +43,50 @@ export function useSessionBootstrap(): {
     retry: false,
   })
 
-  // Cabinet probe: is this user linked to an `Employee` record? This is a UI
-  // HINT, not required data — so ANY error is read as "no cabinet" and can
-  // never bring bootstrap down. (Besides the documented
-  // `400 no_employee_profile` the backend may also answer `403` here.)
+  /**
+   * The cabinet belongs to salespeople, so a manager role is never asked.
+   *
+   * `/dashboard/me` is the ONLY way to ask, and it answers
+   * `400 no_employee_profile` to everyone without a cabinet — which for a
+   * manager is a guaranteed failed request on every page load. Skipping it
+   * removes the call entirely rather than merely hiding its result.
+   *
+   * The trade is deliberate: the API does allow a manager who is also linked to
+   * an `Employee` to open a cabinet, and such a user will not be offered the
+   * link here.
+   */
+  const mayHaveCabinet = user ? !isManagerRole(user.role) : false
+
+  // Remembered for a day, so even a cabinet user pays for the probe once
+  // rather than on every load.
+  const cached = user && mayHaveCabinet ? readCabinetFlag(user.id) : null
+
   const cabinetQuery = useQuery({
     queryKey: queryKeys.session.cabinet(),
-    queryFn: () => sessionApi.hasCabinet().catch(() => false),
-    enabled: hasCompany,
+    // A UI HINT, not required data — so ANY error is read as "no cabinet" and
+    // can never bring bootstrap down. (Besides the documented
+    // `400 no_employee_profile` the backend may also answer `403` here.)
+    queryFn: async () => {
+      const result = await sessionApi.hasCabinet().catch(() => false)
+      if (user) writeCabinetFlag(user.id, result)
+      return result
+    },
+    enabled: hasCompany && mayHaveCabinet && cached === null,
     staleTime: 10 * 60_000,
     retry: false,
   })
 
+  const hasCabinet = mayHaveCabinet
+    ? (cached ?? cabinetQuery.data ?? false)
+    : false
+
+  // Bootstrap waits for the probe only when one was actually sent.
+  const cabinetResolved =
+    !mayHaveCabinet || cached !== null || cabinetQuery.isSuccess
+
   const isResolved =
     Boolean(user) &&
-    (!hasCompany || (companyQuery.isSuccess && cabinetQuery.isSuccess))
+    (!hasCompany || (companyQuery.isSuccess && cabinetResolved))
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -65,19 +95,13 @@ export function useSessionBootstrap(): {
     }
     if (!user || !isResolved) return
 
-    setContext(
-      buildSessionContext(
-        user,
-        companyQuery.data ?? null,
-        cabinetQuery.data ?? false,
-      ),
-    )
+    setContext(buildSessionContext(user, companyQuery.data ?? null, hasCabinet))
   }, [
     isAuthenticated,
     isResolved,
     user,
     companyQuery.data,
-    cabinetQuery.data,
+    hasCabinet,
     setContext,
   ])
 

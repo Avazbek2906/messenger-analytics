@@ -630,6 +630,10 @@ export const en: Messages = {
   'ask.busy':
     'The AI is busy. Your question was fine — press Ask again in a moment.',
   'ask.evidence': 'Conversations behind the answer',
+  'ask.clear': 'Clear the thread',
+  'ask.suggestion.1': 'Which employee is performing best?',
+  'ask.suggestion.2': 'What reason loses us the most sales?',
+  'ask.suggestion.3': 'What should we fix first in this period?',
   'ask.scopeHint':
     'The model sees only this period’s statistics — never message text or customer contact details. Every question is independent; the previous one is not remembered.',
 

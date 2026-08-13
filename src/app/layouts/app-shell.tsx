@@ -3,7 +3,9 @@ import { X } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
+import { ROUTES } from '@/app/router/routes'
 import { useSession } from '@/entities/session'
+import { AskDock } from '@/features/ask-ai'
 import { useTranslation } from '@/shared/i18n'
 import { useLocalStorage } from '@/shared/hooks/use-local-storage'
 import { cn } from '@/shared/lib'
@@ -30,6 +32,16 @@ export function AppShell() {
     false,
   )
   const [mobileOpen, setMobileOpen] = useState(false)
+  // The dock starts closed — it is empty until a question is asked, and the
+  // charts are what the page is for. The choice is remembered, so a manager
+  // who works with it open gets it back on the next visit.
+  const [askOpen, setAskOpen] = useLocalStorage('ma.ask-open', false)
+
+  // `/dashboard/ask` answers about a period, and the period filter lives on the
+  // dashboard. Offering the dock on a page with no filter would ask about a
+  // window the user cannot see or change — so it is offered there and nowhere
+  // else.
+  const canAsk = location.pathname === ROUTES.dashboard
 
   const { primary, secondary } = buildNavigation(session)
 
@@ -65,18 +77,25 @@ export function AppShell() {
         secondary={secondary}
       />
 
+      {canAsk ? <AskDock open={askOpen} onOpenChange={setAskOpen} /> : null}
+
       <div
         className={cn(
           'flex min-h-dvh flex-col transition-[padding] duration-(--duration-base) ease-(--ease-out-soft)',
           collapsed
             ? 'lg:pl-(--spacing-sidebar-collapsed)'
             : 'lg:pl-(--spacing-sidebar)',
+          // The dock shrinks the page instead of covering it, so the chart the
+          // question is about stays readable beside the answer.
+          askOpen && canAsk && 'lg:pr-(--spacing-ask-dock)',
         )}
       >
         <AppTopbar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
           onOpenMobileNav={() => setMobileOpen(true)}
+          askOpen={askOpen}
+          onToggleAsk={canAsk ? () => setAskOpen(!askOpen) : undefined}
         />
 
         <main id="main" className="flex-1 px-4 py-6 lg:px-6 lg:py-8">

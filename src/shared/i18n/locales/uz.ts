@@ -636,6 +636,10 @@ export const uz = {
   'ask.busy':
     'AI hozir band. Savolingiz to‘g‘ri — bir lahzadan keyin «So‘rash» tugmasini qayta bosing.',
   'ask.evidence': 'Javob asoslangan suhbatlar',
+  'ask.clear': 'Suhbatni tozalash',
+  'ask.suggestion.1': 'Qaysi xodim eng yaxshi ishlayapti?',
+  'ask.suggestion.2': 'Sotuvlar eng ko‘p qaysi sabab bilan yo‘qolyapti?',
+  'ask.suggestion.3': 'Shu davrda nimani birinchi bo‘lib tuzatish kerak?',
   'ask.scopeHint':
     'Model faqat shu davr statistikasini ko‘radi: yozishmalar matni ham, mijoz kontaktlari ham unga berilmaydi. Har bir savol mustaqil — oldingi savol eslab qolinmaydi.',
 

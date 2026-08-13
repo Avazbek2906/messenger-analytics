@@ -87,6 +87,31 @@ export interface FunnelStep {
   note: string
 }
 
+/**
+ * A broken rule, exactly as the model emitted it.
+ *
+ * `rule_violations` is prompt-version dependent and docs/03 says so outright:
+ * render it generically, never against a fixed shape. Earlier prompts emitted
+ * bare code strings; the deployed one emits an object carrying the quoted
+ * message and the reasoning. Both are accepted — `normalizeViolations` folds
+ * them into one shape so the UI never sees the difference.
+ */
+export type RawRuleViolation =
+  | string
+  | {
+      rule?: string
+      /** The quoted message that triggered it. */
+      location?: string
+      explanation?: string
+    }
+
+/** The normalised form. Missing parts are `''`, never `undefined`. */
+export interface RuleViolation {
+  rule: string
+  location: string
+  explanation: string
+}
+
 export interface AnalysisResult {
   id: UUID
   stage: AnalysisStage
@@ -99,7 +124,7 @@ export interface AnalysisResult {
   score: number | null
   /** Free-form JSON — keys depend on the prompt version, so render generically. */
   sub_scores: Record<string, number>
-  rule_violations: string[]
+  rule_violations: RawRuleViolation[]
   funnel: FunnelStep[]
   needs_review: boolean
   products_of_interest: ProductRef[]

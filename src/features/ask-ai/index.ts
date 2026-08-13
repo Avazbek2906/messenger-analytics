@@ -1,1 +1,2 @@
-export { AskPanel } from './ui/ask-panel'
+export { AskDock } from './ui/ask-dock'
+export { AskTrigger } from './ui/ask-trigger'

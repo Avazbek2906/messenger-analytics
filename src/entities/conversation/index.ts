@@ -5,6 +5,7 @@ export type {
   OverridePayload,
 } from './api/conversation-api'
 export { attributionGap, attributionGapHintKey } from './model/attribution'
+export { normalizeViolations } from './model/violations'
 export type { AttributionGap } from './model/attribution'
 export {
   AGREEMENT_TONES,

@@ -7,6 +7,7 @@ import {
 } from '@/entities/dashboard'
 import { useTranslation } from '@/shared/i18n'
 import { formatNumber } from '@/shared/lib'
+import { rubricScale } from '@/shared/ui/charts/chart-theme'
 import { EmptyState } from '@/shared/ui/feedback/states'
 import { Card, CardBody, CardHeader } from '@/shared/ui/primitives/card'
 
@@ -20,6 +21,7 @@ import { Card, CardBody, CardHeader } from '@/shared/ui/primitives/card'
 export function EmployeeRubric({ card }: { card: EmployeeCard }) {
   const { t } = useTranslation()
   const hasCriteria = card.criteria.some((item) => item.avg_score !== null)
+  const scale = rubricScale(card.criteria.map((item) => item.avg_score))
 
   return (
     <>
@@ -37,11 +39,13 @@ export function EmployeeRubric({ card }: { card: EmployeeCard }) {
                   title={t('criteria.strengths')}
                   variant="strengths"
                   items={card.strengths}
+                  scale={scale}
                 />
                 <CriteriaList
                   title={t('criteria.weaknesses')}
                   variant="weaknesses"
                   items={card.weaknesses}
+                  scale={scale}
                 />
               </div>
             </div>

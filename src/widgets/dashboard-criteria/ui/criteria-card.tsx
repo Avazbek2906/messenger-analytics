@@ -7,6 +7,7 @@ import {
 import type { PeriodParams } from '@/shared/api'
 import { useTranslation } from '@/shared/i18n'
 import { formatNumber } from '@/shared/lib'
+import { rubricScale } from '@/shared/ui/charts/chart-theme'
 import { QueryBoundary } from '@/shared/ui/feedback/query-boundary'
 import { EmptyState } from '@/shared/ui/feedback/states'
 import { Card, CardBody, CardHeader } from '@/shared/ui/primitives/card'
@@ -51,24 +52,32 @@ export function CriteriaCard({ period }: { period: PeriodParams }) {
             />
           }
         >
-          {(data) => (
-            <div className="space-y-6">
-              <CriteriaRadar criteria={data.criteria} />
+          {(data) => {
+            // One denominator for the radar and both lists, taken from the full
+            // criteria set so the three views cannot disagree.
+            const scale = rubricScale(data.criteria.map((c) => c.avg_score))
 
-              <div className="grid gap-6 border-t border-line pt-5 sm:grid-cols-2">
-                <CriteriaList
-                  title={t('criteria.strengths')}
-                  variant="strengths"
-                  items={data.strengths}
-                />
-                <CriteriaList
-                  title={t('criteria.weaknesses')}
-                  variant="weaknesses"
-                  items={data.weaknesses}
-                />
+            return (
+              <div className="space-y-6">
+                <CriteriaRadar criteria={data.criteria} />
+
+                <div className="grid gap-6 border-t border-line pt-5 sm:grid-cols-2">
+                  <CriteriaList
+                    title={t('criteria.strengths')}
+                    variant="strengths"
+                    items={data.strengths}
+                    scale={scale}
+                  />
+                  <CriteriaList
+                    title={t('criteria.weaknesses')}
+                    variant="weaknesses"
+                    items={data.weaknesses}
+                    scale={scale}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )
+          }}
         </QueryBoundary>
       </CardBody>
     </Card>

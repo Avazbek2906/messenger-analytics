@@ -12,6 +12,7 @@ import { criterionLabelKey } from '../model/labels'
 import type { CriterionStat } from '../model/types'
 import { useTranslation } from '@/shared/i18n'
 import { formatNumber, formatScore } from '@/shared/lib'
+import { rubricScale } from '@/shared/ui/charts/chart-theme'
 import { ChartTooltip } from '@/shared/ui/charts/chart-tooltip'
 
 /**
@@ -22,6 +23,11 @@ import { ChartTooltip } from '@/shared/ui/charts/chart-tooltip'
  */
 export function CriteriaRadar({ criteria }: { criteria: CriterionStat[] }) {
   const { t } = useTranslation()
+
+  // Detected, not assumed — the rubric is 0–10 on the deployed prompt and
+  // 0–100 on the one docs/05 documents. A fixed domain would flatten the
+  // polygon to a dot under whichever of the two is not in use.
+  const scale = rubricScale(criteria.map((item) => item.avg_score))
 
   const data = criteria
     .filter((item) => item.avg_score !== null)
@@ -41,7 +47,7 @@ export function CriteriaRadar({ criteria }: { criteria: CriterionStat[] }) {
             dataKey="label"
             tick={{ fontSize: 11, fill: 'var(--color-fg-muted)' }}
           />
-          <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+          <PolarRadiusAxis domain={[0, scale]} tick={false} axisLine={false} />
 
           <Tooltip
             content={({ active, payload }) => {
@@ -56,7 +62,7 @@ export function CriteriaRadar({ criteria }: { criteria: CriterionStat[] }) {
                     {
                       key: 'score',
                       label: t('criteria.average'),
-                      value: `${formatScore(point.score)} ${t('common.outOf100')}`,
+                      value: `${formatScore(point.score)} / ${scale}`,
                       color: 'var(--color-chart-1)',
                     },
                   ]}

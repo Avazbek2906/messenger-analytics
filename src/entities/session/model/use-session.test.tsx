@@ -20,7 +20,7 @@ vi.mock('../api/session-api', () => ({
   },
 }))
 
-const USER: CurrentUser = {
+const MANAGER: CurrentUser = {
   id: 'u1',
   username: 'aziza.k',
   email: 'aziza@example.com',
@@ -29,6 +29,9 @@ const USER: CurrentUser = {
   role: 'manager',
   company: 'c1',
 }
+
+/** Only a non-manager role can own a cabinet, so the probe targets this one. */
+const SALESPERSON: CurrentUser = { ...MANAGER, id: 'u2', role: 'viewer' }
 
 const COMPANY: Company = {
   id: 'c1',
@@ -47,10 +50,12 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 beforeEach(() => {
+  // The cabinet answer is persisted between loads — each test starts clean.
+  localStorage.clear()
   tokenStore.set({ access: 'A1', refresh: 'R1' })
   useSessionStore.setState({ isAuthenticated: true, context: null })
 
-  vi.mocked(sessionApi.me).mockResolvedValue(USER)
+  vi.mocked(sessionApi.me).mockResolvedValue(SALESPERSON)
   vi.mocked(sessionApi.company).mockResolvedValue(COMPANY)
 })
 
@@ -60,6 +65,20 @@ afterEach(() => {
 })
 
 describe('useSessionBootstrap', () => {
+  it('never asks about the cabinet for a manager role', async () => {
+    // `/dashboard/me` answers `400 no_employee_profile` to a manager, so the
+    // probe would fail on every page load while telling us nothing we act on:
+    // a manager is never in cabinet mode.
+    vi.mocked(sessionApi.me).mockResolvedValue(MANAGER)
+
+    const { result } = renderHook(() => useSessionBootstrap(), { wrapper })
+
+    await waitFor(() => expect(result.current.context).not.toBeNull())
+    expect(sessionApi.hasCabinet).not.toHaveBeenCalled()
+    expect(result.current.context?.hasEmployeeProfile).toBe(false)
+    expect(result.current.context?.canViewCompanyDashboards).toBe(true)
+  })
+
   it('opens the cabinet when an employee profile exists', async () => {
     vi.mocked(sessionApi.hasCabinet).mockResolvedValue(true)
 
@@ -88,6 +107,27 @@ describe('useSessionBootstrap', () => {
     expect(result.current.error).toBeNull()
     expect(result.current.context?.hasEmployeeProfile).toBe(false)
     expect(result.current.context?.canViewCompanyDashboards).toBe(true)
+  })
+
+  it('asks for the cabinet once, then remembers the answer', async () => {
+    // `/dashboard/me` answers `400 no_employee_profile` for every user without
+    // a cabinet, so an unremembered probe is a guaranteed failed request on
+    // every single page load.
+    vi.mocked(sessionApi.hasCabinet).mockResolvedValue(false)
+
+    const first = renderHook(() => useSessionBootstrap(), { wrapper })
+    await waitFor(() => expect(first.result.current.context).not.toBeNull())
+    expect(sessionApi.hasCabinet).toHaveBeenCalledTimes(1)
+
+    first.unmount()
+    useSessionStore.setState({ context: null })
+
+    // A fresh mount stands in for a page reload: same tokens, new QueryClient.
+    const second = renderHook(() => useSessionBootstrap(), { wrapper })
+    await waitFor(() => expect(second.result.current.context).not.toBeNull())
+
+    expect(sessionApi.hasCabinet).toHaveBeenCalledTimes(1)
+    expect(second.result.current.context?.hasEmployeeProfile).toBe(false)
   })
 
   it('surfaces a `users/me` failure as a bootstrap error', async () => {
