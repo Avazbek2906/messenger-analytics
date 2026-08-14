@@ -35,7 +35,7 @@ export function AnalysisDetails({ analysis }: { analysis: AnalysisResult }) {
               className="border-l-2 border-danger pl-3"
             >
               {violation.rule ? (
-                <Badge tone="danger" size="sm">
+                <Badge tone="danger" size="sm" wrap>
                   {violation.rule}
                 </Badge>
               ) : null}
@@ -87,15 +87,15 @@ export function AnalysisDetails({ analysis }: { analysis: AnalysisResult }) {
       >
         <ul className="flex flex-wrap gap-1.5">
           {analysis.secondary_reasons.map((reason) => (
-            <li key={reason.id}>
-              <Badge tone="outline" size="sm">
+            <li key={reason.id} className="min-w-0">
+              <Badge tone="outline" size="sm" wrap>
                 {reason.label}
               </Badge>
             </li>
           ))}
           {analysis.other_reason_text ? (
-            <li>
-              <Badge tone="neutral" size="sm">
+            <li className="min-w-0">
+              <Badge tone="neutral" size="sm" wrap>
                 {analysis.other_reason_text}
               </Badge>
             </li>

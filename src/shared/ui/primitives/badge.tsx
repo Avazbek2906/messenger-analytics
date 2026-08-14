@@ -10,7 +10,11 @@ import { cn } from '@/shared/lib'
  * badges always ship with text (and an icon where it helps).
  */
 const badgeVariants = cva(
-  'inline-flex items-center gap-1.5 rounded-full font-medium whitespace-nowrap [&_svg]:size-3.5 [&_svg]:shrink-0',
+  // `max-w-full` is a hard guarantee, not styling: a badge holding text the
+  // layout did not budget for must never be able to widen the PAGE. It has
+  // done exactly that — a 104-character model-written theme put the whole
+  // products screen into horizontal scroll.
+  'inline-flex max-w-full items-center gap-1.5 overflow-hidden rounded-full font-medium text-ellipsis whitespace-nowrap [&_svg]:size-3.5 [&_svg]:shrink-0',
   {
     variants: {
       tone: {
@@ -37,6 +41,14 @@ export type BadgeTone = NonNullable<VariantProps<typeof badgeVariants>['tone']>
 export interface BadgeProps
   extends ComponentPropsWithoutRef<'span'>, VariantProps<typeof badgeVariants> {
   icon?: ReactNode
+  /**
+   * Lets the badge grow to several lines instead of clipping.
+   *
+   * For content whose length the UI does not control — a catalog label, a
+   * reason a manager typed, anything a model wrote. Truncating those loses the
+   * only information the badge carries, so they wrap.
+   */
+  wrap?: boolean
 }
 
 export function Badge({
@@ -44,11 +56,19 @@ export function Badge({
   tone,
   size,
   icon,
+  wrap,
   children,
   ...props
 }: BadgeProps) {
   return (
-    <span className={cn(badgeVariants({ tone, size }), className)} {...props}>
+    <span
+      className={cn(
+        badgeVariants({ tone, size }),
+        wrap && 'h-auto items-start py-0.5 text-left whitespace-normal',
+        className,
+      )}
+      {...props}
+    >
       {icon}
       {children}
     </span>

@@ -76,7 +76,7 @@ export function ProductRow({ product }: { product: LostProduct }) {
               key={reason.reason}
               className="flex flex-wrap items-center gap-2 py-1"
             >
-              <Badge tone="outline" size="sm">
+              <Badge tone="outline" size="sm" wrap>
                 {reason.label}
               </Badge>
               <span className="tabular text-xs text-fg-muted">
