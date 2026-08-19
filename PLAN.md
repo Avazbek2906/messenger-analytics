@@ -1,79 +1,79 @@
 # Messenger Analytics — Frontend Plan
 
 > Backend: `https://monitoring.jakhongir.dev/api/v1` (docs: `docs/01`–`docs/07`).
-> Read-only toward customers: **hech qachon** composer / reply / mark-as-read UI qurilmaydi.
+> Read-only toward customers: composer / reply / mark-as-read UI is **never** built.
 
 ---
 
-## 1. Texnologiya tanlovi
+## 1. Technology choices
 
-| Qatlam | Tanlov | Sabab |
+| Layer | Choice | Reason |
 |---|---|---|
-| Build | **Vite 7** + React 19 + TypeScript (strict) | Eng tez dev-server va build; SSR kerak emas (JWT-only SPA, SEO yo'q) |
-| Styling | **Tailwind CSS v4** (CSS-first `@theme`) | Token-driven, runtime CSS yo'q, eng tez |
+| Build | **Vite 7** + React 19 + TypeScript (strict) | Fastest dev server and build; no SSR needed (JWT-only SPA, no SEO) |
+| Styling | **Tailwind CSS v4** (CSS-first `@theme`) | Token-driven, no runtime CSS, fastest |
 | Routing | **React Router v7** (`createBrowserRouter`, lazy routes) | Route-level code splitting, data-router guards |
-| Server state | **TanStack Query v5** | Backend 120s cache semantikasi bilan mos, polling/refetch/invalidate built-in |
-| Client state | **Zustand** (faqat auth/session) | Boshqa hamma narsa Query'da — global store shishmaydi |
-| Formalar | **react-hook-form + zod** | Field-level xatolar `errors[].attr` bilan to'g'ridan-to'g'ri bog'lanadi |
-| UI primitivlar | **Radix UI** + `cva` + `tailwind-merge` | Accessible (focus trap, keyboard nav) — o'zimiz yozgan qatlam bilan |
-| Charts | **Recharts 3** | Composable React API, referens dizayndagi silliq line/donut/radar/funnel uchun yetarli |
-| Ikonkalar | **lucide-react** | Bir xil stroke (1.5px), SVG — emoji ishlatilmaydi |
-| Sanalar | **date-fns** (+ o'z `parseApiDate`) | Backend `YYYY-MM-DD HH:MM:SS` — ISO emas, defensive parsing shart |
-| Ko'p tillilik | **O'z qatlamimiz** (`shared/i18n`) | uz / ru / en; tipli kalitlar + `Intl.PluralRules` — kutubxonasiz, ~1 kB |
-| Testlar | **Vitest + Testing Library** | Core lib (api client, formatters, selektorlar) uchun |
-| Lint | ESLint 9 flat + Prettier + `eslint-plugin-boundaries` | Arxitektura qatlamlarini majburlash |
+| Server state | **TanStack Query v5** | Matches the backend's 120 s cache semantics; polling/refetch/invalidate built in |
+| Client state | **Zustand** (auth/session only) | Everything else lives in Query — the global store never bloats |
+| Forms | **react-hook-form + zod** | Field-level errors map directly to `errors[].attr` |
+| UI primitives | **Radix UI** + `cva` + `tailwind-merge` | Accessible (focus trap, keyboard nav) — with our own layer on top |
+| Charts | **Recharts 3** | Composable React API; enough for the smooth line/donut/radar/funnel of the reference design |
+| Icons | **lucide-react** | Uniform stroke (1.5px), SVG — no emoji |
+| Dates | **date-fns** (+ our own `parseApiDate`) | Backend sends `YYYY-MM-DD HH:MM:SS`, not ISO — defensive parsing is required |
+| i18n | **Our own layer** (`shared/i18n`) | uz / ru / en; typed keys + `Intl.PluralRules` — no library, ~1 kB |
+| Tests | **Vitest + Testing Library** | For core lib (api client, formatters, selectors) |
+| Lint | ESLint 9 flat + Prettier + `eslint-plugin-boundaries` | Enforces the architecture layers |
 
 ---
 
-## 2. Arxitektura — Feature-Sliced Design
+## 2. Architecture — Feature-Sliced Design
 
 ```
 src/
-├─ app/                    # kompozitsiya ildizi
+├─ app/                    # composition root
 │  ├─ providers/           # QueryClient, Router, Theme, Toast, ErrorBoundary
-│  ├─ router/              # route daraxti, guardlar (auth, role, cabinet)
+│  ├─ router/              # route tree, guards (auth, role, cabinet)
 │  └─ layouts/             # AppShell, AuthLayout, SettingsLayout
 │
-├─ pages/                  # route darajasidagi kompozitsiya (FAQAT widget'larni yig'adi)
+├─ pages/                  # route-level composition (assembles widgets ONLY)
 │
-├─ widgets/                # sahifa bo'limlari (KpiRow, ScoreTrendCard, SignalQueue…)
+├─ widgets/                # page sections (KpiRow, ScoreTrendCard, SignalQueue…)
 │
-├─ features/              # foydalanuvchi harakatlari (assign, override, merge, export…)
+├─ features/              # user actions (assign, override, merge, export…)
 │
-├─ entities/              # domen modellari + label map + kichik display komponentlar
+├─ entities/              # domain models + label maps + small display components
 │  ├─ conversation/ employee/ customer/ product/ reason/ signal/ agreement/ …
 │  └─ <entity>/{model,api,ui}
 │
-└─ shared/                # cross-cutting, domenga bog'liq emas
+└─ shared/                # cross-cutting, no domain coupling
    ├─ api/                # http client, ApiError, token store, refresh queue
-   ├─ ui/                 # dizayn tizimi primitivlari (Button, Card, Badge, Table…)
+   ├─ ui/                 # design system primitives (Button, Card, Badge, Table…)
    ├─ lib/                # cn, date, format, number, url
    ├─ config/ hooks/ types/
 ```
 
-**Import qoidasi (ESLint bilan majburlanadi):**
-`app → pages → widgets → features → entities → shared`. Teskari import taqiqlanadi.
+**Import rule (enforced by ESLint):**
+`app → pages → widgets → features → entities → shared`. Reverse imports are forbidden.
 
-**Fayl hajmi qoidasi:** komponent ≤ 150 qator; oshsa — bo'linadi. Har bir mustaqil section = alohida komponent.
+**File size rule:** a component is ≤ 150 lines; beyond that it gets split. Every independent section is its own component.
 
 ---
 
-## 3. Dizayn tizimi (referens rasmlardan)
+## 3. Design system (from the reference images)
 
-Rasmlardan olingan vizual til (kontent emas, faqat stilistika):
+The visual language taken from the images (styling only, not content):
 
-- **Fon:** yumshoq neytral (`#F1F3F8`), kartalar sof oq, katta radius (16–20px)
-- **Soyalar:** juda yumshoq, ko'p qatlamli (`0 1px 2px`, `0 8px 24px -12px`) — og'ir soya yo'q
-- **Chip/badge:** `rounded-full`, tint fon (yashil/orange/ko'k), kichik matn
-- **Icon-button:** kvadrat, `rounded-xl`, oq fon, ingichka border; **active = to'ldirilgan indigo**
-- **Sidebar:** vertikal rounded-square itemlar, active holat solid brand rang
-- **Grafiklar:** ingichka silliq chiziqlar, past-kontrast grid, donut'da qolgan qismi shtrixlangan
-- **Progress:** `rounded-full`, rangli fill + diagonal shtrixli qoldiq
-- **Typography:** Inter (400/500/600/700), tabular-nums raqamlar uchun
+- **Background:** soft neutral (`#F1F3F8`), cards pure white, large radius (16–20px)
+- **Shadows:** very soft, multi-layered (`0 1px 2px`, `0 8px 24px -12px`) — no heavy shadows
+- **Chip/badge:** `rounded-full`, tinted background (green/orange/blue), small text
+- **Icon button:** square, `rounded-xl`, white background, thin border; **active = filled indigo**
+- **Sidebar:** vertical rounded-square items, active state in solid brand colour
+- **Charts:** thin smooth lines, low-contrast grid, the remainder of a donut hatched
+- **Progress:** `rounded-full`, coloured fill + diagonally hatched remainder
+- **Typography:** Inter (400/500/600/700), tabular-nums for numbers
 
-### Token'lar (`shared/ui/styles/theme.css`)
+### Tokens (`shared/ui/styles/theme.css`)
 
-| Rol | Qiymat |
+| Role | Value |
 |---|---|
 | brand / primary | `#4F46E5` (indigo-600) → gradient `#4F46E5 → #06B6D4` (logo) |
 | accent (cyan) | `#06B6D4` |
@@ -81,76 +81,74 @@ Rasmlardan olingan vizual til (kontent emas, faqat stilistika):
 | background | `#F1F3F8` · surface `#FFFFFF` · surface-muted `#F8FAFC` |
 | foreground | `#0F172A` · muted-foreground `#64748B` · border `#E7EAF3` |
 | radius | `sm 8` · `md 12` · `lg 16` · `xl 20` · `full` |
-| spacing | 4pt shkala (4/8/12/16/24/32/48) |
+| spacing | 4pt scale (4/8/12/16/24/32/48) |
 
-### Chart palitrasi (WCAG 3:1, rang-ko'r xavfsiz)
-`#4F46E5` `#06B6D4` `#16A34A` `#F59E0B` `#EC4899` `#8B5CF6` — seriyalar rang + chiziq uslubi bilan farqlanadi.
+### Chart palette (WCAG 3:1, colour-blind safe)
+`#4F46E5` `#06B6D4` `#16A34A` `#F59E0B` `#EC4899` `#8B5CF6` — series are distinguished by colour *and* line style.
 
 ### Logo
-Chat pufakchasi ichida bar-chart — SVG icon; wordmark "Messenger Analytics" Inter Bold, indigo→cyan gradient. Icon + wordmark yonma-yon (kombinatsiyalangan variant).
+A bar chart inside a chat bubble — SVG icon; the "Messenger Analytics" wordmark in Inter Bold with an indigo→cyan gradient. Icon and wordmark side by side (combined variant).
 
 ---
 
-## 4. Backend'dan kelib chiqadigan qat'iy qoidalar (bir marta kodlanadi)
+## 4. Hard rules imposed by the backend (encoded once)
 
-1. **Trailing slash yo'q** — HTTP client path'ga hech qachon `/` qo'shmaydi.
-2. **`company_id` hech qachon yuborilmaydi.**
-3. Xatolar `code` bo'yicha match qilinadi (`byCode` / `byField` map).
-4. Response sanalari `YYYY-MM-DD HH:MM:SS` (UTC) — `parseApiDate()` orqali.
-5. **`null !== 0`** — `—` ko'rsatiladi, chart chizig'i uziladi.
-6. Token: access 5 kun, refresh 7 kun, rotation yo'q → reaktiv refresh, bitta in-flight promise.
-7. Role gating: `owner|admin|manager` = yozish; `viewer` = read-only; **employee-linked user = kabinet** (`/dashboard/me` dan boshqasi 403).
-8. Dashboard 120s cache → override'dan keyin "yangilanmoqda…" holati, spam retry yo'q.
-9. Audio va export: JWT bilan `fetch → blob` (bare `<audio src>` / `<a download>` ishlamaydi).
-10. Deltalar: `*_percent` = `%`, `*_points` = ball; `first_response_percent` manfiy = **yaxshi**.
+1. **No trailing slash** — the HTTP client never appends `/` to a path.
+2. **`company_id` is never sent.**
+3. Errors are matched by `code` (`byCode` / `byField` maps).
+4. Response dates are `YYYY-MM-DD HH:MM:SS` (UTC) — via `parseApiDate()`.
+5. **`null !== 0`** — render `—`, break the chart line.
+6. Tokens: access 5 days, refresh 7 days, no rotation → reactive refresh with a single in-flight promise.
+7. Role gating: `owner|admin|manager` = write; `viewer` = read-only; **employee-linked user = cabinet** (anything other than `/dashboard/me` is 403).
+8. Dashboard cache is 120 s → after an override show an "updating…" state, no retry spam.
+9. Audio and exports: `fetch → blob` with JWT (a bare `<audio src>` / `<a download>` will not work).
+10. Deltas: `*_percent` = `%`, `*_points` = points; a negative `first_response_percent` is **good**.
 
 ---
 
-## 5. Sahifalar xaritasi
+## 5. Page map
 
-| Route | Sahifa | Asosiy endpointlar |
+| Route | Page | Main endpoints |
 |---|---|---|
-| `/login` | Kirish | `auth/token` |
+| `/login` | Sign in | `auth/token` |
 | `/` | Dashboard | `overview`, `timeseries`, `criteria`, `funnel`, `signals`, `insights` |
-| `/conversations` | Suhbatlar ro'yxati | `chats/conversations` (+ 15 filtr) |
-| `/conversations/:id` | Suhbat detali | `+/messages`, `/assign`, `/override` |
-| `/customers` | Mijozlar | `chats/customers`, `/merge` |
-| `/team` | Jamoa + bo'limlar | `dashboard/employees`, `/departments` |
-| `/team/:id` | Xodim kartasi | `dashboard/employees/{id}` |
-| `/products` | Mahsulot & fikrlar | `dashboard/products`, `/reasons` |
-| `/agreements` | Kelishuvlar | `dashboard/agreements` |
-| `/reports` | Eksportlar | `dashboard/exports` |
-| `/me` | Xodim kabineti | `dashboard/me` |
-| `/settings/company` | Kompaniya sozlamalari | `companies/me` |
-| `/settings/employees` | Xodimlar CRUD | `companies/employees` |
-| `/settings/catalog` | Mahsulot / Sabab / Qoidalar | `catalog/*` |
+| `/conversations` | Conversation list | `chats/conversations` (+ 15 filters) |
+| `/conversations/:id` | Conversation detail | `+/messages`, `/assign`, `/override` |
+| `/customers` | Customers | `chats/customers`, `/merge` |
+| `/team` | Team + departments | `dashboard/employees`, `/departments` |
+| `/team/:id` | Employee card | `dashboard/employees/{id}` |
+| `/products` | Products & feedback | `dashboard/products`, `/reasons` |
+| `/agreements` | Agreements | `dashboard/agreements` |
+| `/reports` | Exports | `dashboard/exports` |
+| `/me` | Employee cabinet | `dashboard/me` |
+| `/settings/company` | Company settings | `companies/me` |
+| `/settings/employees` | Employee CRUD | `companies/employees` |
+| `/settings/catalog` | Products / Reasons / Rules | `catalog/*` |
 | `/settings/integrations` | Telegram / Instagram / Web | `integrations/*` |
 
 ---
 
-## 6. Bosqichlar (har biri alohida "next")
+## 6. Stages (each one is a separate "next")
 
-| # | Bosqich | Mazmuni |
+| # | Stage | Contents |
 |---|---|---|
-| ~~1~~ | ~~Poydevor~~ ✅ | Scaffolding, tooling, dizayn token'lari, UI kit, AppShell + sidebar, auth (login/refresh/bootstrap), routing + guardlar, xato ishlash qatlami, logo |
-| ~~2~~ | ~~Dashboard~~ ✅ | KPI qatori, natijalar donuti, trend grafigi, rubrika radar, skript funneli, davr filtri (URL'da) |
-| ~~2.5~~ | ~~Ko'p tillilik~~ ✅ | uz / ru / en; tipli lug'atlar, `Intl.PluralRules`, tilga bog'liq raqam va sana formati, til tanlagich |
-| ~~3~~ | ~~Suhbatlar~~ ✅ | Ro'yxat + 15 filtr (URL'da), detal (transkript + tahlil paneli), override/assign, audio pleyer, tuzatishlar tarixi |
-| ~~4~~ | ~~Jamoa~~ ✅ | Reyting jadvali (mezon bo'yicha qayta saralash), bo'limlar, xodim kartasi, kabinet `/me` |
-| ~~5~~ | ~~Mahsulot & sabablar~~ ✅ | Yo'qotilgan imkoniyatlar (drill-down bilan), sabab ulushlari, emerging feedback, kelishuvlar bo'limi |
-| ~~6~~ | ~~Signallar & AI~~ ✅ | Diqqat navbati (7 signal, resolve), widget insights, ask chat (400 kunlik clamp + 90s timeout) |
-| ~~7~~ | ~~Sozlamalar~~ ✅ | Kompaniya, xodimlar CRUD + smena tahrirlagichi, katalog (mahsulot/sabab/rulebook upload+polling) |
-| ~~8~~ | ~~Integratsiyalar~~ ✅ | Telegram QR/SMS login (2FA bilan), Instagram OAuth, vidjet kaliti, backfill tierlari |
-| ~~9~~ | ~~Mijozlar & hisobotlar~~ ✅ | Mijozlar katalogi + birlashtirish, eksport lifecycle (poll + blob download) |
-| ~~10~~ | ~~Sayqal~~ ✅ | Dark mode (token almashuvi), lug'atlarni lazy yuklash (−28 kB gz), sahifa sarlavhalari, klaviatura navigatsiyasi, kontrast auditi |
+| ~~1~~ | ~~Foundation~~ ✅ | Scaffolding, tooling, design tokens, UI kit, AppShell + sidebar, auth (login/refresh/bootstrap), routing + guards, error handling layer, logo |
+| ~~2~~ | ~~Dashboard~~ ✅ | KPI row, outcome donut, trend chart, rubric radar, script funnel, period filter (in the URL) |
+| ~~2.5~~ | ~~Internationalisation~~ ✅ | uz / ru / en; typed dictionaries, `Intl.PluralRules`, language-bound number and date formats, language switcher |
+| ~~3~~ | ~~Conversations~~ ✅ | List + 15 filters (in the URL), detail (transcript + analysis panel), override/assign, audio player, correction history |
+| ~~4~~ | ~~Team~~ ✅ | Ranking table (re-sortable by criterion), departments, employee card, `/me` cabinet |
+| ~~5~~ | ~~Products & reasons~~ ✅ | Lost opportunities (with drill-down), reason shares, emerging feedback, agreements section |
+| ~~6~~ | ~~Signals & AI~~ ✅ | Attention queue (7 signals, resolve), widget insights, ask chat (400-day clamp + 90 s timeout) |
+| ~~7~~ | ~~Settings~~ ✅ | Company, employee CRUD + shift editor, catalog (product/reason/rulebook upload + polling) |
+| ~~8~~ | ~~Integrations~~ ✅ | Telegram QR/SMS login (with 2FA), Instagram OAuth, widget key, backfill tiers |
+| ~~9~~ | ~~Customers & reports~~ ✅ | Customer catalog + merge, export lifecycle (poll + blob download) |
+| ~~10~~ | ~~Polish~~ ✅ | Dark mode (token swap), lazy-loaded dictionaries (−28 kB gz), page titles, keyboard navigation, contrast audit |
 
 ---
 
-## 7. Sifat mezonlari
+## 7. Quality criteria
 
-- Duplicate kod yo'q: har bir takrorlanuvchi pattern (`StatCard`, `DeltaBadge`, `EmptyState`, `DataTable`, `PeriodFilter`, `AsyncBoundary`) — bitta joyda.
-- Har bir sahifa `pages/` da faqat kompozitsiya; logika `widgets/` va `features/` da.
-- Har bir API modul `entities/*/api` da; komponentlar `fetch` chaqirmaydi — faqat hook.
-- Barcha enum → label konvertatsiyasi `entities/*/model/labels.ts` da markazlashgan.
-</content>
-</invoke>
+- No duplicate code: every recurring pattern (`StatCard`, `DeltaBadge`, `EmptyState`, `DataTable`, `PeriodFilter`, `AsyncBoundary`) lives in exactly one place.
+- Every page in `pages/` is composition only; logic lives in `widgets/` and `features/`.
+- Every API module lives in `entities/*/api`; components never call `fetch` — only hooks.
+- All enum → label conversion is centralised in `entities/*/model/labels.ts`.

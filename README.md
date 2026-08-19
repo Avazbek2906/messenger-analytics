@@ -1,26 +1,26 @@
 # Messenger Analytics — Frontend
 
-Telegram, Instagram va veb-chatdagi savdo suhbatlarini AI bilan tahlil qiluvchi
-platformaning boshqaruv paneli (SPA).
+Dashboard (SPA) for a platform that uses AI to analyse sales conversations from
+Telegram, Instagram and web chat.
 
-> **Muhim:** platforma mijozga nisbatan **faqat o‘qiydi**. Javob yozish, reaksiya,
-> "o‘qildi" belgisi yoki xabar yuborish UI’si hech qachon qurilmaydi — backend’da
-> bunday endpoint yo‘q va bo‘lmaydi.
+> **Important:** the platform is **read-only** toward the customer. UI for
+> replying, reacting, marking as read or sending messages is never built — the
+> backend has no such endpoint and never will.
 
-## Ishga tushirish
+## Getting started
 
 ```bash
 pnpm install
-cp .env.example .env.local     # kerak bo'lsa API manzilini o'zgartiring
+cp .env.example .env.local     # change the API URL if needed
 pnpm dev                       # http://localhost:5173
 ```
 
-| Buyruq | Vazifasi |
+| Command | Purpose |
 |---|---|
 | `pnpm dev` | Dev server |
 | `pnpm build` | Typecheck + production build |
-| `pnpm preview` | Build natijasini ko‘rish |
-| `pnpm typecheck` | Faqat TypeScript tekshiruvi |
+| `pnpm preview` | Preview the build output |
+| `pnpm typecheck` | TypeScript check only |
 | `pnpm lint` | oxlint |
 | `pnpm format` | Prettier |
 | `pnpm test` | Vitest |
@@ -30,67 +30,68 @@ pnpm dev                       # http://localhost:5173
 Vite 8 · React 19 · TypeScript · Tailwind CSS v4 · TanStack Query v5 ·
 React Router v7 · Radix UI · Recharts · Zustand · react-hook-form + zod
 
-## Arxitektura
+## Architecture
 
-Feature-Sliced Design. Import yo‘nalishi bir tomonlama:
+Feature-Sliced Design. Imports flow in one direction only:
 
 ```
 app → pages → widgets → features → entities → shared
 ```
 
-| Qatlam | Nima yashaydi |
+| Layer | What lives there |
 |---|---|
-| `app/` | Providerlar, router, guardlar, layout qobig‘i |
-| `pages/` | Route darajasidagi kompozitsiya (faqat widget yig‘adi) |
-| `widgets/` | Sahifa bo‘limlari |
-| `features/` | Foydalanuvchi harakatlari (override, assign, merge, export…) |
-| `entities/` | Domen modellari, API modullari, label map’lar |
-| `shared/` | HTTP client, UI kit, lib, hook’lar — domenga bog‘liq emas |
+| `app/` | Providers, router, guards, layout shell |
+| `pages/` | Route-level composition (assembles widgets only) |
+| `widgets/` | Page sections |
+| `features/` | User actions (override, assign, merge, export…) |
+| `entities/` | Domain models, API modules, label maps |
+| `shared/` | HTTP client, UI kit, lib, hooks — no domain coupling |
 
-To‘liq reja va bosqichlar: [`PLAN.md`](./PLAN.md).
-Backend API hujjatlari: [`docs/frontend/`](./docs/frontend/) — kanonik nusxa.
-Avval [`00-integration-guide`](./docs/frontend/00-integration-guide.md), keyin
-[`CHANGELOG`](./docs/frontend/CHANGELOG.md), qolgani ma’lumotnoma sifatida.
+Full plan and stages: [`PLAN.md`](./PLAN.md).
+Backend API docs: [`docs/frontend/`](./docs/frontend/) — the canonical copy.
+Start with [`00-integration-guide`](./docs/frontend/00-integration-guide.md), then
+the [`CHANGELOG`](./docs/frontend/CHANGELOG.md); the rest is reference material.
 
-## Ko’p tillilik
+## Internationalisation
 
-Uch til: **o’zbekcha** (manba), **ruscha**, **inglizcha**. Kutubxonasiz, o’z
-qatlamimiz — `src/shared/i18n/`.
+Three languages: **Uzbek** (source), **Russian**, **English**. No library — our
+own layer in `src/shared/i18n/`.
 
 ```tsx
 const { t } = useTranslation()
-t(‘kpi.conversations’)
-t(‘coverage.partial’, { percent: ‘89,3%’, pending: ‘137’ })
+t('kpi.conversations')
+t('coverage.partial', { percent: '89,3%', pending: '137' })
 ```
 
-- Kalitlar `locales/uz.ts` da belgilanadi; `ru.ts` va `en.ts` shu tipga
-  moslashtiriladi — **unutilgan kalit kompilyatsiya xatosi** bo’ladi.
-- Ko’plik shakllari `Intl.PluralRules` orqali — ruschadagi `one / few / many`
-  to’g’ri ishlaydi (`count === 1` tekshiruvi bu yerda yetarli emas).
-- Raqam va sana formatlari faol tilga bog’lanadi (`shared/lib/locale-runtime.ts`):
-  `1 284` (uz/ru) va `1,284` (en).
-- Til `localStorage` da saqlanadi, birinchi marta brauzer tilidan aniqlanadi.
-- Til almashganda daraxt `key` orqali qayta yig’iladi — format qoldiqlari
-  ekranda qolib ketmasligi uchun.
+- Keys are defined in `locales/uz.ts`; `ru.ts` and `en.ts` conform to that type —
+  a **missing key is a compile error**.
+- Plural forms go through `Intl.PluralRules`, so Russian `one / few / many` works
+  correctly (a `count === 1` check is not enough here).
+- Number and date formats are bound to the active language
+  (`shared/lib/locale-runtime.ts`): `1 284` (uz/ru) vs `1,284` (en).
+- The language is persisted in `localStorage` and detected from the browser on
+  first visit.
+- Switching language remounts the tree via `key`, so no stale formatting is left
+  on screen.
 
-> `uz` entry chunk’da (standart til — unga loading holati kerak emas), `ru` va
-> `en` esa alohida chunk sifatida talab bo’yicha yuklanadi.
+> `uz` ships in the entry chunk (it is the default language and needs no loading
+> state), while `ru` and `en` are separate chunks loaded on demand.
 
-## Backend bilan ishlashning qat’iy qoidalari
+## Hard rules for working with the backend
 
-Bular bir marta `shared/` da kodlangan va qayta yozilmasligi kerak:
+These are encoded once in `shared/` and must not be rewritten:
 
-1. **Path oxirida `/` bo‘lmaydi** — `APPEND_SLASH = False`, redirect yo‘q.
-2. **`company_id` hech qachon yuborilmaydi** — tenancy server tomonda.
-3. Xatolar **`code`** bo‘yicha tekshiriladi (`ApiError.byCode` / `byField`).
-4. Javob sanalari `YYYY-MM-DD HH:MM:SS` (UTC) — faqat `parseApiDate()` orqali.
-5. **`null` ≠ `0`** — `—` ko‘rsatiladi, chart chizig‘i uziladi.
-6. Dashboard 120 s serverda keshlanadi — tuzatishdan keyin darhol refetch qilinmaydi.
-7. Audio va Excel yuklab olish JWT talab qiladi → `fetch` → `blob`.
-8. Parol **bir marta** qaytariladi (`invite`, `reset-password`, employee +
-   `account`) — qayta o‘qib bo‘lmaydi, `CredentialsDialog` orqali ko‘rsatiladi.
-9. **Ochiq suhbat** (`closed_at === null`) keshlanmaydi: atribut oxirgi
-   jo‘natuvchi bo‘yicha suhbat davomida o‘zgarishi mumkin.
-10. Cookie yuborilmaydi (`credentials: 'omit'`) — biz bearer-token klientmiz.
-11. Filtr o‘zgarganda skeleton ko‘rsatilmaydi: `keepPreviousData` + xiralashish
-    (`StaleOverlay`). Skeletonlar faqat **birinchi** yuklashda.
+1. **No trailing `/` on paths** — `APPEND_SLASH = False`, no redirects.
+2. **`company_id` is never sent** — tenancy is resolved server-side.
+3. Errors are matched by **`code`** (`ApiError.byCode` / `byField`).
+4. Response dates are `YYYY-MM-DD HH:MM:SS` (UTC) — parse only via `parseApiDate()`.
+5. **`null` ≠ `0`** — render `—` and break the chart line.
+6. The dashboard is cached for 120 s on the server — do not refetch immediately after a correction.
+7. Audio and Excel downloads require JWT → `fetch` → `blob`.
+8. Passwords are returned **once** (`invite`, `reset-password`, employee +
+   `account`) — they cannot be read again and are shown through `CredentialsDialog`.
+9. An **open conversation** (`closed_at === null`) is not cached: its attributes
+   can change during the conversation depending on the last sender.
+10. No cookies are sent (`credentials: 'omit'`) — we are a bearer-token client.
+11. No skeleton when a filter changes: `keepPreviousData` + dimming
+    (`StaleOverlay`). Skeletons appear only on the **first** load.
